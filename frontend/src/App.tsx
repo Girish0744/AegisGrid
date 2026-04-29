@@ -108,6 +108,7 @@ function App() {
             <ThreatPanel data={data} />
             <ActionsPanel data={data} />
             <ScenarioNarrative data={data} />
+            
           </aside>
         </main>
       ) : (
