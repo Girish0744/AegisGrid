@@ -62,7 +62,24 @@ function App() {
   await fetch(`http://127.0.0.1:8000/reset?scenario_type=${scenario}`, {
     method: "POST",
   });
+
+  await fetchState();
 }
+
+async function runDemoMode() {
+  const scenarios = ["balanced", "decoy_heavy", "split_attack"];
+
+  for (const scenario of scenarios) {
+    await fetch(`http://127.0.0.1:8000/reset?scenario_type=${scenario}`, {
+      method: "POST",
+    });
+
+    await fetchState();
+
+    await new Promise((resolve) => setTimeout(resolve, 7000));
+  }
+}
+  
 
   return (
     <div className="app">
@@ -84,6 +101,10 @@ function App() {
 
           <button className="icon-button" type="button" onClick={handleReset} title="Reset simulation">
             <RotateCcw size={18} />
+          </button>
+
+          <button className="demo-button" onClick={runDemoMode}>
+            Run Demo Mode
           </button>
         </div>
       </header>

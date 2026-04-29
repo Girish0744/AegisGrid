@@ -21,3 +21,41 @@ body {
   min-width: 320px;
   background: #020617;
 }
+
+.demo-button {
+  width: 100%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  background: rgba(34, 211, 238, 0.12);
+  color: #67e8f9;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.demo-button:hover {
+  background: rgba(34, 211, 238, 0.2);
+}
+
+.action-card {
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.action-card strong {
+  color: #67e8f9;
+}
+
+.action-card p {
+  margin-top: 8px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.muted {
+  color: #94a3b8;
+  font-size: 13px;
+}
