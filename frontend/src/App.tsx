@@ -8,6 +8,7 @@ import { SwarmMap } from "./components/SwarmMap";
 import { ThreatPanel } from "./components/ThreatPanel";
 import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import { ScenarioSelector } from "./components/ScenarioSelector";
+import { ScenarioDescription } from "./components/ScenarioDescription";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
@@ -99,6 +100,7 @@ function App() {
               scenario={data?.scenario_type ?? data?.scenario ?? "balanced"}
               onChange={resetScenario}
             />
+            <ScenarioDescription scenario={data?.scenario_type ?? data?.scenario ?? "balanced"} />
             <ScenarioPanel data={data} />
             <MetricsPanel data={data} />
             <ThreatPanel data={data} />
