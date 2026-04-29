@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 SCENARIO_TYPE = "decoy_heavy"
-DRONE_COUNT = 100
+DRONE_COUNT = 150
 
 drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
 
