@@ -76,6 +76,7 @@ export type Evaluation = {
 
 export type AegisGridState = {
   scenario: string;
+  scenario_type: string;
   true_drones: Drone[];
   detections: Detection[];
   tracks: Track[];

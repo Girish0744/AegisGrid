@@ -7,6 +7,7 @@ import { ScenarioPanel } from "./components/ScenarioPanel";
 import { SwarmMap } from "./components/SwarmMap";
 import { ThreatPanel } from "./components/ThreatPanel";
 import { ScenarioNarrative } from "./components/ScenarioNarrative";
+import { ScenarioSelector } from "./components/ScenarioSelector";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
@@ -55,6 +56,12 @@ function App() {
     }
   };
 
+  async function resetScenario(scenario: string) {
+  await fetch(`http://127.0.0.1:8000/reset?scenario_type=${scenario}`, {
+    method: "POST",
+  });
+}
+
   return (
     <div className="app">
       <header className="header">
@@ -88,6 +95,10 @@ function App() {
           </section>
 
           <aside className="side">
+            <ScenarioSelector
+              scenario={data?.scenario_type ?? data?.scenario ?? "balanced"}
+              onChange={resetScenario}
+            />
             <ScenarioPanel data={data} />
             <MetricsPanel data={data} />
             <ThreatPanel data={data} />

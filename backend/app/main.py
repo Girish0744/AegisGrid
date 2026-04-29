@@ -21,17 +21,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SCENARIO_TYPE = "balanced"
+current_scenario = "balanced"
 DRONE_COUNT = 100
 
-drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
+drones = generate_drones(DRONE_COUNT, scenario_type=current_scenario)
 
 
 @app.get("/")
 def root():
     return {
         "message": "AegisGrid backend running",
-        "scenario": SCENARIO_TYPE,
+        "scenario": current_scenario,
         "endpoints": {
             "state": "/state",
             "reset": "/reset",
@@ -47,7 +47,7 @@ def get_config():
         "map_height": MAP_HEIGHT,
         "target_x": TARGET_X,
         "target_y": TARGET_Y,
-        "scenario": SCENARIO_TYPE,
+        "scenario": current_scenario,
         "drone_count": DRONE_COUNT
     }
 
@@ -73,7 +73,8 @@ def get_state():
     )
 
     return {
-        "scenario": SCENARIO_TYPE,
+        "scenario": current_scenario,
+        "scenario_type": current_scenario,
         "true_drones": drones,
         "detections": detections,
         "tracks": tracks,
@@ -85,13 +86,21 @@ def get_state():
 
 
 @app.post("/reset")
-def reset_simulation():
-    global drones
+def reset_simulation(scenario_type: str = "balanced"):
+    global drones, current_scenario
+
+    allowed_scenarios = {"balanced", "decoy_heavy", "split_attack"}
+
+    if scenario_type not in allowed_scenarios:
+        scenario_type = "balanced"
+
+    current_scenario = scenario_type
 
     TRACK_HISTORY.clear()
-    drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
+    drones = generate_drones(DRONE_COUNT, scenario_type=current_scenario)
 
     return {
         "message": "simulation reset",
-        "scenario": SCENARIO_TYPE
+        "scenario": current_scenario,
+        "scenario_type": current_scenario
     }
