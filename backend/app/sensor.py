@@ -27,7 +27,11 @@ def generate_sensor_detections(drones: List[Dict]) -> List[Dict]:
             "detected_y": max(0, min(MAP_HEIGHT, detected_y)),
             "confidence": round(random.uniform(0.65, 0.95), 2),
             "sensor_type": random.choice(["radar", "camera"]),
-            "is_false_positive": False
+            "is_false_positive": False,
+
+            # evaluation-only ground truth
+            "is_decoy": drone.get("is_decoy", False),
+            "behavior": drone.get("behavior", "unknown")
         }
 
         detections.append(detection)
@@ -47,7 +51,11 @@ def generate_false_positives() -> List[Dict]:
             "detected_y": random.uniform(0, MAP_HEIGHT),
             "confidence": round(random.uniform(0.35, 0.65), 2),
             "sensor_type": random.choice(["radar", "camera"]),
-            "is_false_positive": True
+            "is_false_positive": True,
+
+            # evaluation-only ground truth
+            "is_decoy": True,
+            "behavior": "false_positive"
         })
 
     return false_detections

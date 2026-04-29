@@ -46,11 +46,13 @@ def evaluate_single_strategy(clusters: List[Dict], assignments: List[Dict]) -> D
         if cluster["cluster_id"] in assigned_cluster_ids
     )
 
-    wasted_resources = sum(
-        1
-        for cluster in clusters
+    wasted_resources = sum(1 for cluster in clusters 
         if cluster["cluster_id"] in assigned_cluster_ids
-        and cluster["threat_level"] == "low"
+        and 
+        (
+            cluster.get("decoy_ratio", 0) > 0.6
+            or cluster.get("false_positive_ratio", 0) > 0.4
+        )
     )
 
     breach_risk = 100 * (1 - covered_threat / total_threat)

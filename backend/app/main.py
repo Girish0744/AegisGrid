@@ -6,7 +6,7 @@ from app.threat_engine import enrich_clusters_with_threat
 from app.decision import allocate_baseline, allocate_aegisgrid
 from app.evaluation import evaluate_strategies
 
-drones = generate_drones(100)
+drones = generate_drones(100, scenario_type="decoy_heavy")
 
 for step in range(5):
     drones = update_drones(drones)

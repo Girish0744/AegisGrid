@@ -38,6 +38,10 @@ def cluster_tracks(tracks: List[Dict]) -> List[Dict]:
         center_y = sum(member["y"] for member in members) / len(members)
         avg_speed = sum(member["estimated_speed"] for member in members) / len(members)
         avg_confidence = sum(member["confidence"] for member in members) / len(members)
+        avg_heading_alignment = sum(
+            member.get("heading_alignment", 0)
+            for member in members
+        ) / len(members)
 
         clusters.append({
             "cluster_id": int(label),
@@ -46,7 +50,11 @@ def cluster_tracks(tracks: List[Dict]) -> List[Dict]:
             "center_y": round(center_y, 2),
             "avg_speed": round(avg_speed, 2),
             "avg_confidence": round(avg_confidence, 2),
-            "member_ids": [member["id"] for member in members]
+            "member_ids": [member["id"] for member in members],
+            "decoy_ratio": round(sum(1 for member in members if member.get("is_decoy", False)) / len(members),2),
+            "false_positive_ratio": round(sum(1 for member in members if member.get("is_false_positive", False)) / len(members),2),
+            "member_ids": [member["id"] for member in members],
+            "avg_heading_alignment": round(avg_heading_alignment, 2),
         })
 
     return clusters

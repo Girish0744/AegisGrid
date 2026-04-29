@@ -24,7 +24,8 @@ def enrich_clusters_with_threat(clusters: List[Dict]) -> List[Dict]:
             distance=distance,
             eta=eta,
             drone_count=cluster["drone_count"],
-            confidence=cluster["avg_confidence"]
+            confidence=cluster["avg_confidence"],
+            heading_alignment=cluster.get("avg_heading_alignment", 0)
         )
 
         enriched_cluster = {
@@ -55,18 +56,21 @@ def calculate_threat_score(
     distance: float,
     eta: float,
     drone_count: int,
-    confidence: float
+    confidence: float,
+    heading_alignment: float
 ) -> float:
     distance_risk = max(0, 1 - (distance / MAX_DISTANCE))
     eta_risk = max(0, 1 - (eta / 120))
     cluster_size_risk = min(1, drone_count / 40)
     confidence_risk = confidence
+    heading_risk = heading_alignment
 
     score = (
-        0.35 * distance_risk +
-        0.30 * eta_risk +
-        0.20 * cluster_size_risk +
-        0.15 * confidence_risk
+        0.15 * distance_risk +
+        0.25 * eta_risk +
+        0.25 * cluster_size_risk +
+        0.15 * confidence_risk +
+        0.20 * heading_risk
     )
 
     return min(1, max(0, score))
