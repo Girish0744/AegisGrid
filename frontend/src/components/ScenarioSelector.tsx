@@ -1,3 +1,5 @@
+import { SlidersHorizontal } from "lucide-react";
+
 type Props = {
   scenario: string;
   onChange: (scenario: string) => void;
@@ -5,15 +7,21 @@ type Props = {
 
 export function ScenarioSelector({ scenario, onChange }: Props) {
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-      <label className="mb-2 block text-sm font-semibold text-slate-300">
-        Scenario
-      </label>
+    <section className="panel">
+      <div className="panel-header">
+        <div>
+          <h2>
+            <SlidersHorizontal size={18} />
+            Scenario Controls
+          </h2>
+          <p className="panel-subtitle">Switch simulation profiles without changing API wiring.</p>
+        </div>
+      </div>
 
       <select
         value={scenario}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white outline-none"
+        onChange={(event) => onChange(event.target.value)}
+        className="select-field"
       >
         <option value="balanced">Balanced Swarm</option>
         <option value="decoy_heavy">Decoy Heavy</option>

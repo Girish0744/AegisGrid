@@ -24,13 +24,18 @@ export function ScenarioDescription({ scenario }: Props) {
   const details = scenarioDetails[scenario] ?? scenarioDetails.balanced;
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-      <h2 className="text-lg font-semibold text-white">{details.title}</h2>
-      <p className="mt-2 text-sm text-slate-300">{details.description}</p>
-      <p className="mt-3 text-sm text-cyan-300">
-        <span className="font-semibold">What this tests: </span>
-        {details.tests}
-      </p>
+    <section className="panel">
+      <div className="panel-header">
+        <div>
+          <h2>{details.title}</h2>
+          <p className="panel-subtitle">{details.description}</p>
+        </div>
+      </div>
+
+      <div className="alert-box">
+        <strong>What this tests</strong>
+        <p>{details.tests}</p>
+      </div>
     </section>
   );
 }

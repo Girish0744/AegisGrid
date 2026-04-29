@@ -10,6 +10,7 @@ import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import { ScenarioSelector } from "./components/ScenarioSelector";
 import { ScenarioDescription } from "./components/ScenarioDescription";
 import { PipelineStatus } from "./components/PipelineStatus";
+import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
@@ -85,6 +86,7 @@ async function runDemoMode() {
     <div className="app">
       <header className="header">
         <div>
+          <p className="eyebrow">Decision Intelligence Console</p>
           <h1>AegisGrid</h1>
           <p>Counter-Swarm Decision Intelligence Platform</p>
         </div>
@@ -103,7 +105,7 @@ async function runDemoMode() {
             <RotateCcw size={18} />
           </button>
 
-          <button className="demo-button" onClick={runDemoMode}>
+          <button className="demo-button" type="button" onClick={runDemoMode}>
             Run Demo Mode
           </button>
         </div>
@@ -118,22 +120,37 @@ async function runDemoMode() {
           </section>
 
           <aside className="side">
-            <ScenarioSelector
-              scenario={data?.scenario_type ?? data?.scenario ?? "balanced"}
-              onChange={resetScenario}
-            />
-            <ScenarioDescription scenario={data?.scenario_type ?? data?.scenario ?? "balanced"} />
-            <PipelineStatus data={data} />
-            <ScenarioPanel data={data} />
             <MetricsPanel data={data} />
             <ThreatPanel data={data} />
+            <PipelineStatus data={data} />
             <ActionsPanel data={data} />
-            <ScenarioNarrative data={data} />
-            
           </aside>
+
+          <section className="bottom-grid">
+            <div className="control-stack">
+              <ScenarioSelector
+                scenario={data?.scenario_type ?? data?.scenario ?? "balanced"}
+                onChange={resetScenario}
+              />
+              <ScenarioDescription scenario={data?.scenario_type ?? data?.scenario ?? "balanced"} />
+              <ScenarioPanel data={data} />
+            </div>
+
+            <div className="narrative-stack">
+              <ScenarioNarrative data={data} />
+              <LogPanel data={data} />
+            </div>
+          </section>
         </main>
       ) : (
-        <div className="loading">Loading AegisGrid...</div>
+        <div className="loading">
+          <div className="loading-card">
+            Loading AegisGrid...
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton wide" />
+          </div>
+        </div>
       )}
     </div>
   );

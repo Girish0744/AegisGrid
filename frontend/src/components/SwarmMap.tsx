@@ -1,68 +1,3 @@
-// import type { AegisGridState, ThreatLevel } from "../types";
-
-// export function SwarmMap({ data }: { data: AegisGridState }) {
-//   const assignedClusterIds = new Set(
-//     data.aegisgrid_decision.assignments.map((assignment) => assignment.cluster_id),
-//   );
-
-//   return (
-//     <svg viewBox="0 0 1000 1000" className="map" role="img" aria-label="Swarm tactical map">
-//       <rect width="1000" height="1000" fill="#020617" />
-//       <circle cx="500" cy="500" r="44" fill="#38bdf8" opacity="0.95" />
-//       <text x="410" y="570" fill="#e0f2fe" fontSize="22" fontWeight="bold">
-//         Data Center Alpha
-//       </text>
-
-//       {data.tracks.map((track) => (
-//         <circle
-//           key={track.id}
-//           cx={track.x}
-//           cy={track.y}
-//           r={track.is_false_positive ? 3 : 4}
-//           fill={track.is_false_positive ? "#64748b" : "#60a5fa"}
-//           opacity={track.is_false_positive ? 0.35 : 0.9}
-//         />
-//       ))}
-
-//       {data.clusters.map((cluster) => {
-//         const color = getThreatColor(cluster.threat_level);
-//         const isAssigned = assignedClusterIds.has(cluster.cluster_id);
-
-//         return (
-//           <g key={cluster.cluster_id}>
-//             <circle
-//               cx={cluster.center_x}
-//               cy={cluster.center_y}
-//               r={Math.max(34, cluster.drone_count * 4)}
-//               fill="none"
-//               stroke={color}
-//               strokeWidth={isAssigned ? 6 : 3}
-//               strokeDasharray={isAssigned ? "0" : "9 9"}
-//               opacity="0.92"
-//             />
-
-//             <text
-//               x={cluster.center_x + 12}
-//               y={cluster.center_y - 12}
-//               fill={color}
-//               fontSize="20"
-//               fontWeight="bold"
-//             >
-//               C{cluster.cluster_id} - {cluster.threat_score}
-//             </text>
-//           </g>
-//         );
-//       })}
-//     </svg>
-//   );
-// }
-
-// function getThreatColor(level: ThreatLevel) {
-//   if (level === "critical") return "#ef4444";
-//   if (level === "medium") return "#f59e0b";
-//   return "#22c55e";
-// }
-
 import type { AegisGridState, Cluster, ThreatLevel } from "../types";
 
 export function SwarmMap({ data }: { data: AegisGridState }) {
@@ -74,20 +9,36 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
     data.aegisgrid_decision.assignments.map((assignment) => assignment.cluster_id),
   );
 
-  const topThreat = [...data.clusters].sort(
-    (a, b) => b.threat_score - a.threat_score,
-  )[0];
+  const topThreat = [...data.clusters].sort((a, b) => b.threat_score - a.threat_score)[0];
 
   return (
     <svg viewBox="0 0 1000 1000" className="map" role="img" aria-label="Swarm tactical map">
-      <rect width="1000" height="1000" fill="#020617" />
+      <defs>
+        <radialGradient id="targetGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.82" />
+          <stop offset="65%" stopColor="#0891b2" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#020617" stopOpacity="0" />
+        </radialGradient>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="7" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
 
+      <rect width="1000" height="1000" fill="#020617" />
       <MapGrid />
 
-      <circle cx="500" cy="500" r="48" fill="#38bdf8" opacity="0.2" />
-      <circle cx="500" cy="500" r="34" fill="#38bdf8" opacity="0.95" />
-      <text x="410" y="570" fill="#e0f2fe" fontSize="22" fontWeight="bold">
+      <circle cx="500" cy="500" r="118" fill="url(#targetGlow)" />
+      <circle cx="500" cy="500" r="38" fill="#22d3ee" opacity="0.92" filter="url(#softGlow)" />
+      <circle cx="500" cy="500" r="14" fill="#ecfeff" />
+      <text x="408" y="574" fill="#e0f2fe" fontSize="22" fontWeight="800">
         Data Center Alpha
+      </text>
+      <text x="425" y="604" fill="#94a3b8" fontSize="15">
+        Protected objective
       </text>
 
       {data.baseline_decision.assignments.map((assignment) => {
@@ -97,14 +48,14 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
         return (
           <line
             key={`baseline-${assignment.resource_id}`}
+            className="map-line"
             x1={500}
             y1={500}
             x2={cluster.center_x}
             y2={cluster.center_y}
             stroke="#94a3b8"
-            strokeWidth={3}
-            strokeDasharray="8 8"
-            opacity={0.6}
+            strokeWidth={2}
+            opacity={0.42}
           />
         );
       })}
@@ -122,7 +73,8 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
             y2={cluster.center_y}
             stroke="#22c55e"
             strokeWidth={4}
-            opacity={0.9}
+            opacity={0.88}
+            strokeLinecap="round"
           />
         );
       })}
@@ -130,12 +82,17 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
       {data.tracks.map((track) => (
         <circle
           key={track.id}
+          className="map-point"
           cx={track.x}
           cy={track.y}
-          r={track.is_false_positive ? 3 : 4}
+          r={track.is_false_positive ? 3 : 4.5}
           fill={track.is_false_positive ? "#64748b" : "#60a5fa"}
-          opacity={track.is_false_positive ? 0.35 : 0.9}
-        />
+          opacity={track.is_false_positive ? 0.34 : 0.86}
+        >
+          <title>
+            {track.id} - confidence {Math.round(track.confidence * 100)}%
+          </title>
+        </circle>
       ))}
 
       {data.clusters.map((cluster) => {
@@ -143,53 +100,59 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
         const isAegisAssigned = aegisAssignedIds.has(cluster.cluster_id);
         const isBaselineAssigned = baselineAssignedIds.has(cluster.cluster_id);
         const isTopThreat = topThreat?.cluster_id === cluster.cluster_id;
+        const radius = Math.max(36, cluster.drone_count * 4.5);
 
         return (
           <g key={cluster.cluster_id}>
-            {isTopThreat && (
-              <>
-                <circle
-                  cx={cluster.center_x}
-                  cy={cluster.center_y}
-                  r={Math.max(70, cluster.drone_count * 5.5)}
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth={7}
-                  opacity="0.45"
-                />
+            <circle
+              className="cluster-ring"
+              cx={cluster.center_x}
+              cy={cluster.center_y}
+              r={radius + 18}
+              fill={color}
+              opacity={isTopThreat ? 0.12 : 0.07}
+              filter="url(#softGlow)"
+            />
 
-                <text
-                  x={cluster.center_x + 18}
-                  y={cluster.center_y - 36}
-                  fill="#ef4444"
-                  fontSize="22"
-                  fontWeight="bold"
-                >
-                  TOP THREAT
-                </text>
-              </>
+            {isTopThreat && (
+              <text
+                x={cluster.center_x + 18}
+                y={cluster.center_y - radius - 22}
+                fill="#fca5a5"
+                fontSize="21"
+                fontWeight="900"
+              >
+                TOP THREAT
+              </text>
             )}
 
             <circle
               cx={cluster.center_x}
               cy={cluster.center_y}
-              r={Math.max(34, cluster.drone_count * 4)}
+              r={radius}
               fill="none"
               stroke={color}
-              strokeWidth={isAegisAssigned ? 6 : isBaselineAssigned ? 4 : 3}
-              strokeDasharray={isAegisAssigned ? "0" : "9 9"}
-              opacity="0.92"
+              strokeWidth={isAegisAssigned ? 7 : isBaselineAssigned ? 4 : 3}
+              strokeDasharray={isAegisAssigned ? "0" : "10 9"}
+              opacity="0.94"
             />
 
+            <circle cx={cluster.center_x} cy={cluster.center_y} r="5" fill={color} />
+
             <text
-              x={cluster.center_x + 12}
+              x={cluster.center_x + 13}
               y={cluster.center_y - 12}
               fill={color}
               fontSize="20"
-              fontWeight="bold"
+              fontWeight="900"
             >
-              C{cluster.cluster_id} · {cluster.threat_score}
+              C{cluster.cluster_id} | {cluster.threat_score}
             </text>
+
+            <title>
+              Cluster {cluster.cluster_id}: {cluster.drone_count} drones, ETA {cluster.eta}s,
+              threat {cluster.threat_score}
+            </title>
           </g>
         );
       })}
@@ -204,14 +167,21 @@ function findCluster(clusters: Cluster[], clusterId: number) {
 }
 
 function MapGrid() {
-  const lines = Array.from({ length: 11 }, (_, index) => index * 100);
+  const majorLines = Array.from({ length: 11 }, (_, index) => index * 100);
+  const minorLines = Array.from({ length: 21 }, (_, index) => index * 50);
 
   return (
     <>
-      {lines.map((position) => (
-        <g key={position}>
-          <line x1={position} y1={0} x2={position} y2={1000} stroke="#1e293b" strokeWidth={1} />
-          <line x1={0} y1={position} x2={1000} y2={position} stroke="#1e293b" strokeWidth={1} />
+      {minorLines.map((position) => (
+        <g key={`minor-${position}`}>
+          <line x1={position} y1={0} x2={position} y2={1000} stroke="#0f172a" strokeWidth={1} />
+          <line x1={0} y1={position} x2={1000} y2={position} stroke="#0f172a" strokeWidth={1} />
+        </g>
+      ))}
+      {majorLines.map((position) => (
+        <g key={`major-${position}`}>
+          <line x1={position} y1={0} x2={position} y2={1000} stroke="#1e293b" strokeWidth={1.2} />
+          <line x1={0} y1={position} x2={1000} y2={position} stroke="#1e293b" strokeWidth={1.2} />
         </g>
       ))}
     </>
@@ -221,19 +191,17 @@ function MapGrid() {
 function MapLegend() {
   return (
     <g>
-      <rect x="24" y="24" width="300" height="142" rx="12" fill="#020617" stroke="#1e293b" />
-      <circle cx="48" cy="52" r="5" fill="#60a5fa" />
-      <text x="66" y="58" fill="#cbd5e1" fontSize="16">Fused sensor track</text>
+      <rect x="24" y="24" width="315" height="152" rx="18" fill="#020617" stroke="#1e293b" opacity="0.94" />
+      <text x="44" y="54" fill="#f8fafc" fontSize="17" fontWeight="900">Tactical Overlay</text>
 
-      <line x1="36" y1="82" x2="58" y2="82" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 6" />
-      <text x="66" y="88" fill="#cbd5e1" fontSize="16">Baseline allocation</text>
+      <circle cx="50" cy="84" r="5" fill="#60a5fa" />
+      <text x="68" y="90" fill="#cbd5e1" fontSize="15">Fused sensor track</text>
 
-      <line x1="36" y1="112" x2="58" y2="112" stroke="#22c55e" strokeWidth="4" />
-      <text x="66" y="118" fill="#cbd5e1" fontSize="16">AegisGrid allocation</text>
+      <line x1="38" y1="113" x2="62" y2="113" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 6" />
+      <text x="68" y="119" fill="#cbd5e1" fontSize="15">Baseline allocation</text>
 
-      <circle cx="48" cy="146" r="7" fill="none" stroke="#ef4444" strokeWidth="3" />
-      <text x="66" y="152" fill="#fca5a5" fontSize="16">Top threat cluster</text>
-
+      <line x1="38" y1="142" x2="62" y2="142" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" />
+      <text x="68" y="148" fill="#cbd5e1" fontSize="15">AegisGrid allocation</text>
     </g>
   );
 }

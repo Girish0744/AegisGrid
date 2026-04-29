@@ -1,3 +1,4 @@
+import { RadioTower } from "lucide-react";
 import type { AegisGridState } from "../types";
 
 export function PipelineStatus({ data }: { data: AegisGridState }) {
@@ -31,28 +32,25 @@ export function PipelineStatus({ data }: { data: AegisGridState }) {
 
   return (
     <section className="panel">
-      <h2 className="mb-3 text-lg font-semibold text-white">System Pipeline</h2>
+      <div className="panel-header">
+        <div>
+          <h2>
+            <RadioTower size={18} />
+            System Pipeline
+          </h2>
+          <p className="panel-subtitle">Live progression from simulation to response.</p>
+        </div>
+      </div>
 
-      <div className="space-y-3">
-        {stages.map((stage) => (
-          <div
-            key={stage.name}
-            className="flex items-center justify-between rounded-xl bg-slate-950 px-3 py-2"
-          >
-            <div>
-              <p className="text-sm font-semibold text-white">{stage.name}</p>
-              <p className="text-xs text-slate-400">{stage.value}</p>
+      <div className="pipeline">
+        {stages.map((stage, index) => (
+          <div key={stage.name} className={`pipeline-step ${stage.active ? "active" : ""}`}>
+            <div className="step-index">{index + 1}</div>
+            <div className="step-copy">
+              <strong>{stage.name}</strong>
+              <p>{stage.value}</p>
             </div>
-
-            <span
-              className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                stage.active
-                  ? "bg-emerald-500/20 text-emerald-300"
-                  : "bg-slate-700 text-slate-300"
-              }`}
-            >
-              {stage.active ? "ACTIVE" : "WAITING"}
-            </span>
+            <span className="step-state">{stage.active ? "ACTIVE" : "WAIT"}</span>
           </div>
         ))}
       </div>
