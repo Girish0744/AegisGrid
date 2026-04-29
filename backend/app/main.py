@@ -1,3 +1,6 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.simulation import generate_drones, update_drones
 from app.sensor import generate_sensor_detections
 from app.fusion import fuse_detections
@@ -6,10 +9,37 @@ from app.threat_engine import enrich_clusters_with_threat
 from app.decision import allocate_baseline, allocate_aegisgrid
 from app.evaluation import evaluate_strategies
 
-drones = generate_drones(100, scenario_type="decoy_heavy")
 
-for step in range(5):
+app = FastAPI(title="AegisGrid API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+SCENARIO_TYPE = "decoy_heavy"
+DRONE_COUNT = 100
+
+drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "AegisGrid backend running",
+        "scenario": SCENARIO_TYPE
+    }
+
+
+@app.get("/state")
+def get_state():
+    global drones
+
     drones = update_drones(drones)
+
     detections = generate_sensor_detections(drones)
     tracks = fuse_detections(detections)
     clusters = cluster_tracks(tracks)
@@ -24,14 +54,25 @@ for step in range(5):
         aegisgrid_decision
     )
 
-    print(f"\nSTEP {step + 1}")
-    print("CLUSTERS:", len(threat_clusters))
+    return {
+        "scenario": SCENARIO_TYPE,
+        "true_drones": drones,
+        "detections": detections,
+        "tracks": tracks,
+        "clusters": threat_clusters,
+        "baseline_decision": baseline_decision,
+        "aegisgrid_decision": aegisgrid_decision,
+        "evaluation": evaluation
+    }
 
-    print("\nBASELINE:")
-    print(evaluation["baseline"])
 
-    print("\nAEGISGRID:")
-    print(evaluation["aegisgrid"])
+@app.post("/reset")
+def reset_simulation():
+    global drones
 
-    print("\nIMPROVEMENT:")
-    print(evaluation["improvement"])
+    drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
+
+    return {
+        "message": "simulation reset",
+        "scenario": SCENARIO_TYPE
+    }
