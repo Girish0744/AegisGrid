@@ -9,6 +9,7 @@ import { ThreatPanel } from "./components/ThreatPanel";
 import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import { ScenarioSelector } from "./components/ScenarioSelector";
 import { ScenarioDescription } from "./components/ScenarioDescription";
+import { PipelineStatus } from "./components/PipelineStatus";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
@@ -101,6 +102,7 @@ function App() {
               onChange={resetScenario}
             />
             <ScenarioDescription scenario={data?.scenario_type ?? data?.scenario ?? "balanced"} />
+            <PipelineStatus data={data} />
             <ScenarioPanel data={data} />
             <MetricsPanel data={data} />
             <ThreatPanel data={data} />
