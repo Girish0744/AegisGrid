@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.simulation import generate_drones, update_drones
 from app.sensor import generate_sensor_detections
-from app.fusion import fuse_detections
+from app.fusion import TRACK_HISTORY, fuse_detections
 from app.clustering import cluster_tracks
 from app.threat_engine import enrich_clusters_with_threat
 from app.decision import allocate_baseline, allocate_aegisgrid
 from app.evaluation import evaluate_strategies
+from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
 
 app = FastAPI(title="AegisGrid API")
@@ -20,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SCENARIO_TYPE = "decoy_heavy"
+SCENARIO_TYPE = "balanced"
 DRONE_COUNT = 100
 
 drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
@@ -30,7 +31,24 @@ drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
 def root():
     return {
         "message": "AegisGrid backend running",
-        "scenario": SCENARIO_TYPE
+        "scenario": SCENARIO_TYPE,
+        "endpoints": {
+            "state": "/state",
+            "reset": "/reset",
+            "config": "/config"
+        }
+    }
+
+
+@app.get("/config")
+def get_config():
+    return {
+        "map_width": MAP_WIDTH,
+        "map_height": MAP_HEIGHT,
+        "target_x": TARGET_X,
+        "target_y": TARGET_Y,
+        "scenario": SCENARIO_TYPE,
+        "drone_count": DRONE_COUNT
     }
 
 
@@ -70,6 +88,7 @@ def get_state():
 def reset_simulation():
     global drones
 
+    TRACK_HISTORY.clear()
     drones = generate_drones(DRONE_COUNT, scenario_type=SCENARIO_TYPE)
 
     return {
