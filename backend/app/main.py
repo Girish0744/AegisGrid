@@ -104,3 +104,23 @@ def reset_simulation(scenario_type: str = "balanced"):
         "scenario": current_scenario,
         "scenario_type": current_scenario
     }
+
+@app.get("/debug-summary")
+def debug_summary():
+    state = get_state()
+
+    return {
+        "scenario": state["scenario"],
+        "drone_count": len(state["true_drones"]),
+        "detections": len(state["detections"]),
+        "tracks": len(state["tracks"]),
+        "clusters": len(state["clusters"]),
+        "baseline": state["evaluation"]["baseline"],
+        "aegisgrid": state["evaluation"]["aegisgrid"],
+        "improvement": state["evaluation"]["improvement"],
+        "top_clusters": sorted(
+            state["clusters"],
+            key=lambda cluster: cluster["threat_score"],
+            reverse=True
+        )[:3]
+    }
