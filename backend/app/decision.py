@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 
-RESOURCE_COUNT = 5
+RESOURCE_COUNT = 3
 
 
 def allocate_baseline(clusters: List[Dict]) -> Dict:
