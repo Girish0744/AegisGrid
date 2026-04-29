@@ -6,6 +6,7 @@ import { MetricsPanel } from "./components/MetricsPanel";
 import { ScenarioPanel } from "./components/ScenarioPanel";
 import { SwarmMap } from "./components/SwarmMap";
 import { ThreatPanel } from "./components/ThreatPanel";
+import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
@@ -91,6 +92,7 @@ function App() {
             <MetricsPanel data={data} />
             <ThreatPanel data={data} />
             <ActionsPanel data={data} />
+            <ScenarioNarrative data={data} />
           </aside>
         </main>
       ) : (
