@@ -42,6 +42,19 @@ export type Detection = {
 
 export type ThreatLevel = "low" | "medium" | "critical";
 
+export type ThreatFactors = {
+  proximity_risk?: number;
+  eta_risk?: number;
+  predicted_proximity_risk?: number;
+  predicted_eta_risk?: number;
+  trajectory_alignment_risk?: number;
+  speed_risk?: number;
+  swarm_mass_risk?: number;
+  confidence_factor?: number;
+  uncertainty_score?: number;
+  asset_impact_risk?: number;
+};
+
 export type Cluster = {
   cluster_id: number;
   drone_count?: number;
@@ -55,8 +68,17 @@ export type Cluster = {
   member_ids?: string[];
   distance_to_target?: number;
   eta?: number;
+  current_threat_score?: number;
+  predicted_distance_to_target?: number;
+  predicted_eta?: number;
+  predicted_threat_score?: number;
+  threat_delta?: number;
   threat_score?: number;
   threat_level?: ThreatLevel;
+  uncertainty_score?: number;
+  decision_confidence?: number;
+  threat_factors?: ThreatFactors;
+  threat_explanation?: string[];
 };
 
 export type Assignment = {

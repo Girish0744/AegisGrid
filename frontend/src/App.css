@@ -350,6 +350,10 @@ select {
   background: linear-gradient(90deg, #ef4444, #fca5a5);
 }
 
+.progress-fill.amber {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
 .progress-fill.cyan {
   background: linear-gradient(90deg, #0891b2, #67e8f9);
 }
