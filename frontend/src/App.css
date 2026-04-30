@@ -1911,3 +1911,29 @@ select {
     padding: 10px;
   }
 }
+
+.ai-explanation {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  background: rgba(8, 47, 73, 0.25);
+  padding: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.ai-explanation ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+
+.trust-badge {
+  display: inline-block;
+  margin-top: 6px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+  font-size: 11px;
+  font-weight: 700;
+}

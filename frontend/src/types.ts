@@ -123,6 +123,7 @@ export type AegisGridState = {
   raw_aegisgrid_decision?: Decision;
   aegisgrid_decision: Decision;
   evaluation: Evaluation;
+  ai_insights?: AIInsights;
   report?: DecisionReport;
 };
 
@@ -141,6 +142,21 @@ export type AegisGridConfig = {
   target_y: number;
   scenario: string;
   drone_count: number;
+};
+
+export type DecisionExplanation = {
+  cluster_id: number;
+  resource_id: string;
+  summary: string;
+  evidence: string[];
+  confidence_label: "low" | "medium" | "high" | string;
+  if_ignored: string;
+  trust_status: string;
+};
+
+export type AIInsights = {
+  decision_explanations: DecisionExplanation[];
+  trust_status: string;
 };
 
 export type ResetResponse = {

@@ -28,6 +28,11 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
           const threatScore = cluster?.threat_score;
           const statusLabel = getAssignmentStatusLabel(assignment.status);
           const secondsRemaining = assignment.seconds_remaining_estimate;
+          const explanation = data.ai_insights?.decision_explanations.find(
+            (item) =>
+              item.cluster_id === assignment.cluster_id &&
+              item.resource_id === assignment.resource_id,
+          );
 
           return (
             <div className="action" key={assignment.resource_id}>
@@ -59,9 +64,30 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                 </p>
               )}
               <p>Reason: {assignment.reason}</p>
-              <p className="action-warning">
-                If ignored: this cluster remains one of the highest contributors to breach risk.
-              </p>
+              {explanation ? (
+                <div className="ai-explanation">
+                  <p>{explanation.summary}</p>
+
+                  <ul>
+                    {explanation.evidence.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+
+                  <p>
+                    <strong>If ignored:</strong> {explanation.if_ignored}
+                  </p>
+
+                  <span className="trust-badge">
+                    Trust: {explanation.trust_status} · Confidence:{" "}
+                    {explanation.confidence_label}
+                  </span>
+                </div>
+              ) : (
+                <p className="action-warning">
+                  If ignored: explanation unavailable for this allocation.
+                </p>
+              )}
             </div>
           );
         })}
