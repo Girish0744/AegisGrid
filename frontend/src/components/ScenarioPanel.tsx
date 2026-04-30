@@ -15,7 +15,7 @@ export function ScenarioPanel({ data }: { data: AegisGridState }) {
       </div>
 
       <div className="scenario-grid">
-        <Stat label="Type" value={data.scenario_type ?? data.scenario} />
+        <Stat label="Type" value={data.scenario_type ?? data.scenario ?? "unknown"} />
         <Stat label="Tracks" value={data.tracks.length} />
         <Stat label="Clusters" value={data.clusters.length} />
         <Stat label="Resources" value={data.aegisgrid_decision.assignments.length} />

@@ -9,7 +9,9 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
     data.aegisgrid_decision.assignments.map((assignment) => assignment.cluster_id),
   );
 
-  const topThreat = [...data.clusters].sort((a, b) => b.threat_score - a.threat_score)[0];
+  const topThreat = [...data.clusters].sort(
+    (a, b) => (b.threat_score ?? 0) - (a.threat_score ?? 0),
+  )[0];
 
   return (
     <svg viewBox="0 0 1000 1000" className="map" role="img" aria-label="Swarm tactical map">
@@ -96,11 +98,11 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
       ))}
 
       {data.clusters.map((cluster) => {
-        const color = getThreatColor(cluster.threat_level);
+        const color = getThreatColor(cluster.threat_level ?? "low");
         const isAegisAssigned = aegisAssignedIds.has(cluster.cluster_id);
         const isBaselineAssigned = baselineAssignedIds.has(cluster.cluster_id);
         const isTopThreat = topThreat?.cluster_id === cluster.cluster_id;
-        const radius = Math.max(36, cluster.drone_count * 4.5);
+        const radius = Math.max(36, (cluster.drone_count ?? 0) * 4.5);
 
         return (
           <g key={cluster.cluster_id}>
@@ -146,12 +148,12 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
               fontSize="20"
               fontWeight="900"
             >
-              C{cluster.cluster_id} | {cluster.threat_score}
+              C{cluster.cluster_id} | {(cluster.threat_score ?? 0).toFixed(1)}
             </text>
 
             <title>
-              Cluster {cluster.cluster_id}: {cluster.drone_count} drones, ETA {cluster.eta}s,
-              threat {cluster.threat_score}
+              Cluster {cluster.cluster_id}: {cluster.drone_count ?? 0} drones, ETA {cluster.eta ?? "unknown"}s,
+              threat {cluster.threat_score ?? 0}
             </title>
           </g>
         );

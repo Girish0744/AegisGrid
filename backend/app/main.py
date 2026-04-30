@@ -71,6 +71,13 @@ def get_state():
         baseline_decision,
         aegisgrid_decision
     )
+    report = build_report(
+        drones=drones,
+        detections=detections,
+        clusters=threat_clusters,
+        evaluation=evaluation,
+        aegisgrid_decision=aegisgrid_decision
+    )
 
     return {
         "scenario": current_scenario,
@@ -81,7 +88,8 @@ def get_state():
         "clusters": threat_clusters,
         "baseline_decision": baseline_decision,
         "aegisgrid_decision": aegisgrid_decision,
-        "evaluation": evaluation
+        "evaluation": evaluation,
+        "report": report
     }
 
 
@@ -104,6 +112,64 @@ def reset_simulation(scenario_type: str = "balanced"):
         "scenario": current_scenario,
         "scenario_type": current_scenario
     }
+
+
+def build_report(drones, detections, clusters, evaluation, aegisgrid_decision):
+    true_detections = [
+        detection for detection in detections
+        if not detection.get("is_false_positive", False)
+    ]
+    drone_count = len(drones)
+    detection_rate = 0
+
+    if drone_count:
+        detection_rate = round((len(true_detections) / drone_count) * 100, 2)
+
+    missed_detection_estimate = max(0, drone_count - len(true_detections))
+    top_cluster = None
+
+    if clusters:
+        top_cluster = max(
+            clusters,
+            key=lambda cluster: cluster.get("threat_score", 0)
+        )
+
+    aegis_metrics = evaluation.get("aegisgrid", {})
+    improvement = evaluation.get("improvement", 0)
+    critical_clusters = sum(
+        1 for cluster in clusters
+        if cluster.get("threat_level") == "critical"
+    )
+
+    return {
+        "detection_rate": detection_rate,
+        "missed_detection_estimate": missed_detection_estimate,
+        "cluster_count": len(clusters),
+        "top_threat_cluster_id": (
+            top_cluster.get("cluster_id") if top_cluster else None
+        ),
+        "verdict": classify_verdict(
+            breach_risk=aegis_metrics.get("breach_risk", 100),
+            improvement=improvement,
+            critical_clusters=critical_clusters,
+            assignments_count=len(aegisgrid_decision.get("assignments", []))
+        )
+    }
+
+
+def classify_verdict(
+    breach_risk,
+    improvement,
+    critical_clusters,
+    assignments_count
+):
+    if breach_risk <= 35 and improvement >= 20:
+        return "BREACH RISK CONTAINED"
+
+    if breach_risk <= 55 and assignments_count >= min(critical_clusters, 1):
+        return "PARTIAL CONTAINMENT"
+
+    return "HIGH RISK - ADDITIONAL RESOURCES REQUIRED"
 
 @app.get("/debug-summary")
 def debug_summary():

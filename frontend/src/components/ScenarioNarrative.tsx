@@ -2,7 +2,9 @@ import { FileText } from "lucide-react";
 import type { AegisGridState } from "../types";
 
 export function ScenarioNarrative({ data }: { data: AegisGridState }) {
-  const topThreat = [...data.clusters].sort((a, b) => b.threat_score - a.threat_score)[0];
+  const topThreat = [...data.clusters].sort(
+    (a, b) => (b.threat_score ?? 0) - (a.threat_score ?? 0),
+  )[0];
   const improvement = data.evaluation?.improvement ?? 0;
 
   return (
@@ -23,8 +25,8 @@ export function ScenarioNarrative({ data }: { data: AegisGridState }) {
         <div className="alert-box red">
           <strong>Primary threat cluster identified</strong>
           <p>
-            Cluster {topThreat.cluster_id} contains {topThreat.drone_count} drones, has an ETA
-            of {topThreat.eta}s, and is rated {topThreat.threat_level.toUpperCase()}.
+            Cluster {topThreat.cluster_id} contains {topThreat.drone_count ?? 0} drones, has an ETA
+            of {topThreat.eta ?? "unknown"}s, and is rated {(topThreat.threat_level ?? "low").toUpperCase()}.
           </p>
         </div>
       )}
@@ -36,6 +38,10 @@ export function ScenarioNarrative({ data }: { data: AegisGridState }) {
           compared to the baseline strategy.
         </p>
       </div>
+
+      <p className="safety-note">
+        Simulation-only decision support. No offensive capabilities, weapons control, or autonomous engagement.
+      </p>
     </section>
   );
 }

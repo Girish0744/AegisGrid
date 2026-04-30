@@ -19,8 +19,10 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
           const cluster = data.clusters.find(
             (candidate) => candidate.cluster_id === assignment.cluster_id,
           );
-
-          if (!cluster) return null;
+          const threatLevel = cluster?.threat_level ?? "low";
+          const eta = cluster?.eta;
+          const droneCount = cluster?.drone_count;
+          const threatScore = cluster?.threat_score;
 
           return (
             <div className="action" key={assignment.resource_id}>
@@ -28,15 +30,20 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                 <b>
                   {assignment.resource_id} to Cluster {assignment.cluster_id}
                 </b>
-                <span className={`threat-badge ${cluster.threat_level}`}>
-                  {cluster.threat_level}
-                </span>
+                <span className={`threat-badge ${threatLevel}`}>{threatLevel}</span>
               </div>
 
               <p>
-                ETA {cluster.eta}s | {cluster.drone_count} drones | Strategy {assignment.strategy}
+                {eta !== undefined ? `ETA ${eta.toFixed(1)}s` : "ETA unavailable"} |{" "}
+                {droneCount !== undefined ? `${droneCount} drones` : "size unavailable"} |{" "}
+                {threatScore !== undefined
+                  ? `Threat score ${threatScore.toFixed(1)}`
+                  : "threat score unavailable"}
               </p>
-              <p>{assignment.reason}</p>
+              <p>Reason: {assignment.reason}</p>
+              <p className="action-warning">
+                If ignored: this cluster remains one of the highest contributors to breach risk.
+              </p>
             </div>
           );
         })}

@@ -2,7 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw, RotateCcw, Wifi, WifiOff } from "lucide-react";
 import { getState, resetSimulation } from "./api";
 import { ActionsPanel } from "./components/ActionsPanel";
+import { AttackSummary } from "./components/AttackSummary";
+import { CommandVerdict } from "./components/CommandVerdict";
+import { DetectionAnalysis } from "./components/DetectionAnalysis";
+import { EventTimeline } from "./components/EventTimeline";
 import { MetricsPanel } from "./components/MetricsPanel";
+import { OutcomeSummary } from "./components/OutcomeSummary";
 import { ScenarioPanel } from "./components/ScenarioPanel";
 import { SwarmMap } from "./components/SwarmMap";
 import { ThreatPanel } from "./components/ThreatPanel";
@@ -14,10 +19,20 @@ import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
 import "./App.css";
 
+type DashboardView = "live" | "analysis" | "decision" | "outcome";
+
+const dashboardViews: Array<{ id: DashboardView; label: string }> = [
+  { id: "live", label: "Live" },
+  { id: "analysis", label: "Analysis" },
+  { id: "decision", label: "Decision" },
+  { id: "outcome", label: "Outcome" },
+];
+
 function App() {
   const [data, setData] = useState<AegisGridState | null>(null);
   const [error, setError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeView, setActiveView] = useState<DashboardView>("live");
   const isFetchInFlight = useRef(false);
 
   const fetchState = useCallback(async () => {
@@ -60,27 +75,20 @@ function App() {
   };
 
   async function resetScenario(scenario: string) {
-  await fetch(`http://127.0.0.1:8000/reset?scenario_type=${scenario}`, {
-    method: "POST",
-  });
-
-  await fetchState();
-}
-
-async function runDemoMode() {
-  const scenarios = ["balanced", "decoy_heavy", "split_attack"];
-
-  for (const scenario of scenarios) {
-    await fetch(`http://127.0.0.1:8000/reset?scenario_type=${scenario}`, {
-      method: "POST",
-    });
-
+    await resetSimulation(scenario);
     await fetchState();
-
-    await new Promise((resolve) => setTimeout(resolve, 7000));
   }
-}
-  
+
+  async function runDemoMode() {
+    const scenarios = ["balanced", "decoy_heavy", "split_attack"];
+
+    for (const scenario of scenarios) {
+      await resetSimulation(scenario);
+      await fetchState();
+
+      await new Promise((resolve) => setTimeout(resolve, 7000));
+    }
+  }
 
   return (
     <div className="app">
@@ -111,36 +119,68 @@ async function runDemoMode() {
         </div>
       </header>
 
+      <nav className="view-tabs" aria-label="Dashboard views">
+        {dashboardViews.map((view) => (
+          <button
+            className={`view-tab ${activeView === view.id ? "active" : ""}`}
+            key={view.id}
+            type="button"
+            onClick={() => setActiveView(view.id)}
+            aria-pressed={activeView === view.id}
+          >
+            {view.label}
+          </button>
+        ))}
+      </nav>
+
       {error && !data ? (
         <div className="error">{error}</div>
       ) : data ? (
-        <main className="layout">
-          <section className="map-card">
-            <SwarmMap data={data} />
-          </section>
+        <main className="view-content">
+          {activeView === "live" && (
+            <section className="live-layout">
+              <section className="map-card">
+                <SwarmMap data={data} />
+              </section>
 
-          <aside className="side">
-            <MetricsPanel data={data} />
-            <ThreatPanel data={data} />
-            <PipelineStatus data={data} />
-            <ActionsPanel data={data} />
-          </aside>
+              <aside className="live-sidebar">
+                <ScenarioSelector
+                  scenario={data.scenario_type ?? data.scenario ?? "balanced"}
+                  onChange={resetScenario}
+                />
+                <ScenarioDescription scenario={data.scenario_type ?? data.scenario ?? "balanced"} />
+                <CommandVerdict data={data} />
+                <ScenarioPanel data={data} />
+              </aside>
+            </section>
+          )}
 
-          <section className="bottom-grid">
-            <div className="control-stack">
-              <ScenarioSelector
-                scenario={data?.scenario_type ?? data?.scenario ?? "balanced"}
-                onChange={resetScenario}
-              />
-              <ScenarioDescription scenario={data?.scenario_type ?? data?.scenario ?? "balanced"} />
-              <ScenarioPanel data={data} />
-            </div>
+          {activeView === "analysis" && (
+            <section className="dashboard-grid two-column">
+              <AttackSummary data={data} />
+              <DetectionAnalysis data={data} />
+              <PipelineStatus data={data} />
+              <ThreatPanel data={data} />
+            </section>
+          )}
 
-            <div className="narrative-stack">
+          {activeView === "decision" && (
+            <section className="dashboard-grid two-column">
+              <ActionsPanel data={data} />
               <ScenarioNarrative data={data} />
+              <EventTimeline data={data} />
               <LogPanel data={data} />
-            </div>
-          </section>
+            </section>
+          )}
+
+          {activeView === "outcome" && (
+            <section className="dashboard-grid two-column">
+              <MetricsPanel data={data} />
+              <OutcomeSummary data={data} />
+              <CommandVerdict data={data} />
+              <ScenarioPanel data={data} />
+            </section>
+          )}
         </main>
       ) : (
         <div className="loading">

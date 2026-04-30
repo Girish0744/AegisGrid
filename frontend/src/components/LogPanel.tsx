@@ -16,7 +16,7 @@ export function LogPanel({ data }: { data: AegisGridState }) {
   const listRef = useRef<HTMLDivElement | null>(null);
 
   const topThreat = useMemo(
-    () => [...data.clusters].sort((a, b) => b.threat_score - a.threat_score)[0],
+    () => [...data.clusters].sort((a, b) => (b.threat_score ?? 0) - (a.threat_score ?? 0))[0],
     [data.clusters],
   );
 
@@ -63,7 +63,7 @@ export function LogPanel({ data }: { data: AegisGridState }) {
         id: `${eventId}-top-threat`,
         time,
         message: "Top threat updated",
-        detail: `Cluster ${topThreat.cluster_id} scored ${topThreat.threat_score} with ETA ${topThreat.eta}s.`,
+        detail: `Cluster ${topThreat.cluster_id} scored ${(topThreat.threat_score ?? 0).toFixed(1)} with ETA ${topThreat.eta ?? "unknown"}s.`,
         tone: topThreat.threat_level === "critical" ? "red" : "green",
       });
     }

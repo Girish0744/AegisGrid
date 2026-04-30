@@ -1,11 +1,14 @@
 export type Drone = {
   id: string;
-  true_x: number;
-  true_y: number;
+  true_x?: number;
+  true_y?: number;
+  x?: number;
+  y?: number;
   speed: number;
   heading: number;
   behavior: string;
   is_decoy: boolean;
+  status?: string;
 };
 
 export type Track = {
@@ -22,32 +25,38 @@ export type Track = {
 
 export type Detection = {
   id: string;
-  detected_x: number;
-  detected_y: number;
-  confidence: number;
-  sensor_type: "radar" | "camera";
-  is_false_positive: boolean;
-  is_decoy: boolean;
-  behavior: string;
+  detected_x?: number;
+  detected_y?: number;
+  x?: number;
+  y?: number;
+  drone_id?: string;
+  estimated_speed?: number;
+  heading_alignment?: number;
+  confidence?: number;
+  sensor_type?: "radar" | "camera" | string;
+  source?: string;
+  is_false_positive?: boolean;
+  is_decoy?: boolean;
+  behavior?: string;
 };
 
 export type ThreatLevel = "low" | "medium" | "critical";
 
 export type Cluster = {
   cluster_id: number;
-  drone_count: number;
+  drone_count?: number;
   center_x: number;
   center_y: number;
-  avg_speed: number;
-  avg_confidence: number;
-  avg_heading_alignment: number;
-  decoy_ratio: number;
-  false_positive_ratio: number;
-  member_ids: string[];
-  distance_to_target: number;
-  eta: number;
-  threat_score: number;
-  threat_level: ThreatLevel;
+  avg_speed?: number;
+  avg_confidence?: number;
+  avg_heading_alignment?: number;
+  decoy_ratio?: number;
+  false_positive_ratio?: number;
+  member_ids?: string[];
+  distance_to_target?: number;
+  eta?: number;
+  threat_score?: number;
+  threat_level?: ThreatLevel;
 };
 
 export type Assignment = {
@@ -75,8 +84,8 @@ export type Evaluation = {
 };
 
 export type AegisGridState = {
-  scenario: string;
-  scenario_type: string;
+  scenario?: string;
+  scenario_type?: string;
   true_drones: Drone[];
   detections: Detection[];
   tracks: Track[];
@@ -84,6 +93,15 @@ export type AegisGridState = {
   baseline_decision: Decision;
   aegisgrid_decision: Decision;
   evaluation: Evaluation;
+  report?: DecisionReport;
+};
+
+export type DecisionReport = {
+  detection_rate?: number;
+  missed_detection_estimate?: number;
+  cluster_count?: number;
+  top_threat_cluster_id?: number | null;
+  verdict?: string;
 };
 
 export type AegisGridConfig = {

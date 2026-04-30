@@ -13,8 +13,10 @@ export async function getState() {
   return response.data;
 }
 
-export async function resetSimulation() {
-  const response = await api.post<ResetResponse>("/reset");
+export async function resetSimulation(scenarioType?: string) {
+  const response = await api.post<ResetResponse>("/reset", undefined, {
+    params: scenarioType ? { scenario_type: scenarioType } : undefined,
+  });
   return response.data;
 }
 
