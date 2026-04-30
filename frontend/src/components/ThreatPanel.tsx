@@ -33,7 +33,16 @@ export function ThreatPanel({ data }: { data: AegisGridState }) {
 
             <div className="cluster-meta">
               <span>Score {(cluster.threat_score ?? 0).toFixed(1)}</span>
+              {cluster.predicted_threat_score !== undefined && (
+                <span>Predicted {cluster.predicted_threat_score.toFixed(2)}</span>
+              )}
+              {cluster.uncertainty_score !== undefined && (
+                <span>Uncertainty {Math.round(cluster.uncertainty_score * 100)}%</span>
+              )}
               <span>ETA {cluster.eta !== undefined ? `${cluster.eta.toFixed(1)}s` : "unknown"}</span>
+              {cluster.predicted_eta !== undefined && (
+                <span>Predicted ETA {cluster.predicted_eta.toFixed(1)}s</span>
+              )}
               <span>{cluster.drone_count ?? 0} drones</span>
               <span>Avg speed {cluster.avg_speed !== undefined ? cluster.avg_speed.toFixed(1) : "n/a"}</span>
               <span>
@@ -47,12 +56,15 @@ export function ThreatPanel({ data }: { data: AegisGridState }) {
               Simulation validation signal: decoy {Math.round((cluster.decoy_ratio ?? 0) * 100)}% |
               false positive {Math.round((cluster.false_positive_ratio ?? 0) * 100)}%
             </p>
+            {cluster.threat_explanation?.[0] && (
+              <p className="validation-note">{cluster.threat_explanation[0]}</p>
+            )}
 
             <div className="cluster-score">
               <div className="progress-track">
                 <div
                   className={`progress-fill ${cluster.threat_level === "critical" ? "red" : "green"}`}
-                  style={{ width: `${Math.max(6, Math.min(100, cluster.threat_score ?? 0))}%` }}
+                  style={{ width: `${toPercent(cluster.threat_score ?? 0)}%` }}
                 />
               </div>
             </div>
@@ -67,4 +79,9 @@ function getThreatLabel(level: ThreatLevel) {
   if (level === "critical") return "High";
   if (level === "medium") return "Medium";
   return "Low";
+}
+
+function toPercent(score: number) {
+  const normalized = score <= 1 ? score * 100 : score;
+  return Math.max(6, Math.min(100, normalized));
 }
