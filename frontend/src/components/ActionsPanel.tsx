@@ -74,9 +74,7 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                     ))}
                   </ul>
 
-                  <p>
-                    <strong>If ignored:</strong> {explanation.if_ignored}
-                  </p>
+              
 
                   <span className="trust-badge">
                     Trust: {explanation.trust_status} · Confidence:{" "}
@@ -84,9 +82,7 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                   </span>
                 </div>
               ) : (
-                <p className="action-warning">
-                  If ignored: explanation unavailable for this allocation.
-                </p>
+                
               )}
             </div>
           );

@@ -8,7 +8,6 @@ type SnapshotAnalysis = {
   primary_risk: string;
   recommended_focus: string;
   evidence: string[];
-  limitations: string[];
   trust_status: string;
 };
 
@@ -72,15 +71,6 @@ export function AISnapshotAnalysisPanel() {
             <h3>Evidence</h3>
             <ul>
               {analysis.evidence.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="report-section">
-            <h3>Limitations</h3>
-            <ul>
-              {analysis.limitations.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>

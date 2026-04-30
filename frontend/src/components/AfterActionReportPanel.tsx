@@ -64,14 +64,6 @@ export function AfterActionReportPanel({ data }: { data: AegisGridState }) {
         </ul>
       </div>
 
-      <div className="report-section">
-        <h3>Limitations</h3>
-        <ul>
-          {displayReport.limitations.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }
