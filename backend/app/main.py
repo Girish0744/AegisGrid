@@ -11,6 +11,7 @@ from app.decision import (
     allocate_aegisgrid,
     stabilize_assignments
 )
+from app.ai_intelligence import generate_decision_explanations
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -80,6 +81,11 @@ def get_state():
         DECISION_STATE
     )
 
+    decision_explanations = generate_decision_explanations(
+    threat_clusters,
+    aegisgrid_decision
+    )
+
     evaluation = evaluate_strategies(
         threat_clusters,
         baseline_decision,
@@ -103,6 +109,11 @@ def get_state():
         "baseline_decision": baseline_decision,
         "raw_aegisgrid_decision": raw_aegisgrid_decision,
         "aegisgrid_decision": aegisgrid_decision,
+        "ai_insights": 
+        {
+        "decision_explanations": decision_explanations,
+        "trust_status": "deterministic_validated"
+        },
         "evaluation": evaluation,
         "report": report
     }
