@@ -16,6 +16,7 @@ import { ScenarioSelector } from "./components/ScenarioSelector";
 import { StartScreen } from "./components/StartScreen";
 import { PipelineStatus } from "./components/PipelineStatus";
 import { MissionSummaryPanel } from "./components/MissionSummaryPanel";
+import { AfterActionReportPanel } from "./components/AfterActionReportPanel";
 import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
 import "./App.css";
@@ -209,6 +210,7 @@ function App() {
             <section className="dashboard-grid two-column">
               <MetricsPanel data={data} />
               <OutcomeSummary data={data} />
+              <AfterActionReportPanel data={data} />
               <CommandVerdict data={data} />
               <ScenarioPanel data={data} />
             </section>

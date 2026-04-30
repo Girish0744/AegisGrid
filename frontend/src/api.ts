@@ -2,11 +2,11 @@ import axios from "axios";
 import type { AegisGridConfig, AegisGridState, ResetResponse } from "./types";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+  import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000,
+  timeout: 15000,
 });
 
 export async function getState() {
@@ -23,5 +23,10 @@ export async function resetSimulation(scenarioType?: string) {
 
 export async function getConfig() {
   const response = await api.get<AegisGridConfig>("/config");
+  return response.data;
+}
+
+export async function generateAIAfterActionReport() {
+  const response = await api.post("/ai/after-action");
   return response.data;
 }

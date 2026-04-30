@@ -157,6 +157,7 @@ export type DecisionExplanation = {
 export type AIInsights = {
   decision_explanations: DecisionExplanation[];
   mission_summary?: MissionSummary;
+  after_action_report?: AfterActionReport;
   trust_status: string;
 };
 
@@ -164,6 +165,15 @@ export type MissionSummary = {
   summary: string;
   impact: string;
   detection_rate: number;
+  trust_status: string;
+};
+
+export type AfterActionReport = {
+  title: string;
+  summary: string;
+  key_findings: string[];
+  limitations: string[];
+  verdict: string;
   trust_status: string;
 };
 

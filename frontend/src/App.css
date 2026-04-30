@@ -1962,3 +1962,27 @@ select {
   color: #cbd5e1;
   font-size: 13px;
 }
+
+.report-summary {
+  margin-top: 12px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.report-section {
+  margin-top: 14px;
+}
+
+.report-section h3 {
+  color: #67e8f9;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.report-section ul {
+  padding-left: 18px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
