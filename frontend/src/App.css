@@ -484,6 +484,36 @@ select {
   color: #f8fafc;
 }
 
+.action-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.action-status {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #bae6fd;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.34);
+}
+
+.action-status.held {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.34);
+}
+
+.action-status.switched {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.34);
+}
+
 .threat-badge {
   border-radius: 999px;
   padding: 4px 8px;
@@ -525,6 +555,11 @@ select {
 
 .action-warning {
   color: #cbd5e1 !important;
+}
+
+.action-hold {
+  color: #fcd34d !important;
+  font-weight: 800;
 }
 
 .verdict-card {

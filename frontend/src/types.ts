@@ -89,6 +89,10 @@ export type Assignment = {
   cluster_id: number;
   strategy: string;
   reason: string;
+  is_locked?: boolean;
+  ticks_remaining?: number;
+  seconds_remaining_estimate?: number;
+  status?: "held" | "updated" | "switched" | string;
 };
 
 export type Decision = {
@@ -116,6 +120,7 @@ export type AegisGridState = {
   tracks: Track[];
   clusters: Cluster[];
   baseline_decision: Decision;
+  raw_aegisgrid_decision?: Decision;
   aegisgrid_decision: Decision;
   evaluation: Evaluation;
   report?: DecisionReport;
