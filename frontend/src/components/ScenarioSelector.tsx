@@ -3,22 +3,33 @@ import { SlidersHorizontal } from "lucide-react";
 type Props = {
   scenario: string;
   onChange: (scenario: string) => void;
+  compact?: boolean;
 };
 
-export function ScenarioSelector({ scenario, onChange }: Props) {
+export function ScenarioSelector({ scenario, onChange, compact = false }: Props) {
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <h2>
-            <SlidersHorizontal size={18} />
-            Scenario Controls
-          </h2>
-          <p className="panel-subtitle">Switch simulation profiles without changing API wiring.</p>
+    <section className={`panel scenario-selector ${compact ? "compact" : ""}`}>
+      {!compact && (
+        <div className="panel-header">
+          <div>
+            <h2>
+              <SlidersHorizontal size={18} />
+              Scenario Controls
+            </h2>
+            <p className="panel-subtitle">Switch simulation profiles without changing API wiring.</p>
+          </div>
         </div>
-      </div>
+      )}
+
+      {compact && (
+        <label className="scenario-selector-label" htmlFor="scenario-select">
+          <SlidersHorizontal size={15} />
+          Scenario
+        </label>
+      )}
 
       <select
+        id="scenario-select"
         value={scenario}
         onChange={(event) => onChange(event.target.value)}
         className="select-field"
