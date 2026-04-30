@@ -2,10 +2,9 @@ import os
 import json
 from typing import Dict, Any, Optional
 
-from openai import OpenAI
-
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_AI_TIMEOUT_SECONDS = 2.5
 
 
 def call_ai_explanation_agent(context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -16,14 +15,20 @@ def call_ai_explanation_agent(context: Dict[str, Any]) -> Optional[Dict[str, Any
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     model = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+    timeout_seconds = float(
+        os.getenv("OPENROUTER_TIMEOUT_SECONDS", DEFAULT_AI_TIMEOUT_SECONDS)
+    )
 
     if not api_key:
         return None
 
     try:
+        from openai import OpenAI
+
         client = OpenAI(
             base_url=OPENROUTER_BASE_URL,
             api_key=api_key,
+            timeout=4.0,
         )
 
         response = client.chat.completions.create(
@@ -90,3 +95,65 @@ def build_ai_prompt(context: Dict[str, Any]) -> str:
         },
         indent=2,
     )
+
+
+def call_ai_after_action_agent(report_context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    model = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+
+    if not api_key:
+        return None
+
+    try:
+        client = OpenAI(
+            base_url=OPENROUTER_BASE_URL,
+            api_key=api_key,
+            timeout=8.0,
+        )
+
+        response = client.chat.completions.create(
+            model=model,
+            temperature=0.2,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You generate evidence-grounded after-action reports for AegisGrid. "
+                        "Use only provided metrics. Do not invent facts. "
+                        "Return valid JSON only."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps({
+                        "task": "Rewrite this deterministic report into a concise command-level after-action report.",
+                        "rules": [
+                            "Use only provided facts.",
+                            "Do not invent numbers.",
+                            "Do not suggest offensive action.",
+                            "Return valid JSON only."
+                        ],
+                        "required_output": {
+                            "title": "string",
+                            "summary": "string",
+                            "key_findings": ["string"],
+                            "limitations": ["string"],
+                            "verdict": "string",
+                            "trust_status": "ai_generated_validated"
+                        },
+                        "report_context": report_context,
+                    }),
+                },
+            ],
+        )
+
+        content = response.choices[0].message.content
+        if not content:
+            return None
+
+        parsed = json.loads(content)
+        parsed["trust_status"] = "ai_generated_validated"
+        return parsed
+
+    except Exception:
+        return None

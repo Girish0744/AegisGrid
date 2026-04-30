@@ -15,6 +15,7 @@ from app.decision import (
     stabilize_assignments
 )
 from app.ai_intelligence import generate_decision_explanations, generate_mission_summary, generate_after_action_report
+from app.ai_provider import call_ai_after_action_agent
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -136,6 +137,26 @@ def get_state():
         "report": report
     }
 
+@app.post("/ai/after-action")
+def ai_after_action():
+    state = get_state()
+
+    deterministic_report = state["ai_insights"]["after_action_report"]
+
+    ai_report = call_ai_after_action_agent(deterministic_report)
+
+    if ai_report:
+        return {
+            "message": "AI after-action report generated",
+            "report": ai_report,
+            "trust_status": "ai_generated_validated"
+        }
+
+    return {
+        "message": "Deterministic after-action report returned",
+        "report": deterministic_report,
+        "trust_status": deterministic_report["trust_status"]
+    }
 
 @app.post("/reset")
 def reset_simulation(scenario_type: str = "balanced"):
