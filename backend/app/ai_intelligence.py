@@ -44,3 +44,50 @@ def generate_decision_explanations(
         explanations.append(explanation)
 
     return explanations
+
+def generate_mission_summary(state: Dict[str, Any]) -> Dict[str, Any]:
+    clusters = state.get("clusters", [])
+    evaluation = state.get("evaluation", {})
+    detections = state.get("detections", [])
+    tracks = state.get("tracks", [])
+    true_drones = state.get("true_drones", [])
+
+    top_cluster = max(
+        clusters,
+        key=lambda cluster: cluster.get("threat_score", 0),
+        default=None,
+    )
+
+    detection_rate = (
+        round((len(detections) / len(true_drones)) * 100, 1)
+        if true_drones
+        else 0
+    )
+
+    improvement = evaluation.get("improvement", 0)
+
+    summary = (
+        f"AegisGrid is tracking {len(clusters)} active swarm clusters from "
+        f"{len(tracks)} fused tracks with an estimated detection rate of "
+        f"{detection_rate}%."
+    )
+
+    if top_cluster:
+        summary += (
+            f" Cluster {top_cluster['cluster_id']} is currently the primary "
+            f"threat due to {top_cluster.get('threat_level')} threat level, "
+            f"ETA {top_cluster.get('eta')}s, and "
+            f"{top_cluster.get('drone_count')} tracked drones."
+        )
+
+    impact = (
+        f"AegisGrid is reducing simulated breach risk by {improvement}% "
+        f"compared with the baseline allocation strategy."
+    )
+
+    return {
+        "summary": summary,
+        "impact": impact,
+        "detection_rate": detection_rate,
+        "trust_status": "deterministic_validated",
+    }

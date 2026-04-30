@@ -11,7 +11,7 @@ from app.decision import (
     allocate_aegisgrid,
     stabilize_assignments
 )
-from app.ai_intelligence import generate_decision_explanations
+from app.ai_intelligence import generate_decision_explanations, generate_mission_summary
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -82,8 +82,8 @@ def get_state():
     )
 
     decision_explanations = generate_decision_explanations(
-    threat_clusters,
-    aegisgrid_decision
+        threat_clusters,
+        aegisgrid_decision
     )
 
     evaluation = evaluate_strategies(
@@ -91,6 +91,17 @@ def get_state():
         baseline_decision,
         aegisgrid_decision
     )
+
+    state_payload = {
+        "true_drones": drones,
+        "detections": detections,
+        "tracks": tracks,
+        "clusters": threat_clusters,
+        "evaluation": evaluation,
+    }
+    
+    mission_summary = generate_mission_summary(state_payload)
+
     report = build_report(
         drones=drones,
         detections=detections,
@@ -109,10 +120,10 @@ def get_state():
         "baseline_decision": baseline_decision,
         "raw_aegisgrid_decision": raw_aegisgrid_decision,
         "aegisgrid_decision": aegisgrid_decision,
-        "ai_insights": 
-        {
-        "decision_explanations": decision_explanations,
-        "trust_status": "deterministic_validated"
+        "ai_insights": {
+            "decision_explanations": decision_explanations,
+            "mission_summary": mission_summary,
+            "trust_status": "deterministic_validated"
         },
         "evaluation": evaluation,
         "report": report
