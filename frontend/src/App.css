@@ -1937,3 +1937,28 @@ select {
   font-size: 11px;
   font-weight: 700;
 }
+
+.mission-summary-text {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mission-impact {
+  margin-top: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  background: rgba(8, 47, 73, 0.22);
+  padding: 10px;
+}
+
+.mission-impact strong {
+  color: #67e8f9;
+  font-size: 13px;
+}
+
+.mission-impact p {
+  margin-top: 4px;
+  color: #cbd5e1;
+  font-size: 13px;
+}

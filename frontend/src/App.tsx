@@ -15,6 +15,7 @@ import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import { ScenarioSelector } from "./components/ScenarioSelector";
 import { StartScreen } from "./components/StartScreen";
 import { PipelineStatus } from "./components/PipelineStatus";
+import { MissionSummaryPanel } from "./components/MissionSummaryPanel";
 import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
 import "./App.css";
@@ -177,6 +178,7 @@ function App() {
               </section>
 
               <aside className="live-sidebar">
+                <MissionSummaryPanel data={data} />
                 <MetricsPanel data={data} />
                 <ActionsPanel data={data} />
                 <CommandVerdict data={data} />
