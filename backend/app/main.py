@@ -176,15 +176,18 @@ def analyze_snapshot():
     )[:5]
 
     snapshot_context = {
-        "scenario": state["scenario_type"],
-        "drone_count": len(state["true_drones"]),
-        "detections": len(state["detections"]),
-        "tracks": len(state["tracks"]),
-        "cluster_count": len(state["clusters"]),
-        "top_clusters": top_clusters,
-        "aegisgrid_decision": state["aegisgrid_decision"],
-        "evaluation": state["evaluation"],
-        "report": state["report"],
+    "scenario": state["scenario_type"],
+    "simulation_tick": SIMULATION_TICK,
+    "drone_count": len(state["true_drones"]),
+    "detections": len(state["detections"]),
+    "tracks": len(state["tracks"]),
+    "cluster_count": len(state["clusters"]),
+    "top_clusters": top_clusters,
+    "aegisgrid_assignments": state["aegisgrid_decision"]["assignments"],
+    "baseline_metrics": state["evaluation"]["baseline"],
+    "aegisgrid_metrics": state["evaluation"]["aegisgrid"],
+    "improvement": state["evaluation"]["improvement"],
+    "report": state["report"],
     }
 
     ai_analysis = call_ai_snapshot_agent(snapshot_context)
