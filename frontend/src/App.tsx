@@ -13,7 +13,7 @@ import { SwarmMap } from "./components/SwarmMap";
 import { ThreatPanel } from "./components/ThreatPanel";
 import { ScenarioNarrative } from "./components/ScenarioNarrative";
 import { ScenarioSelector } from "./components/ScenarioSelector";
-import { ScenarioDescription } from "./components/ScenarioDescription";
+import { StartScreen } from "./components/StartScreen";
 import { PipelineStatus } from "./components/PipelineStatus";
 import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
@@ -32,6 +32,8 @@ function App() {
   const [data, setData] = useState<AegisGridState | null>(null);
   const [error, setError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isBooting, setIsBooting] = useState(false);
   const [activeView, setActiveView] = useState<DashboardView>("live");
   const isFetchInFlight = useRef(false);
 
@@ -56,14 +58,28 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!hasStarted) {
+      return;
+    }
+
     const initialFetchId = window.setTimeout(fetchState, 0);
-    const intervalId = window.setInterval(fetchState, 800);
+    const intervalId = window.setInterval(fetchState, 1200);
 
     return () => {
       window.clearTimeout(initialFetchId);
       window.clearInterval(intervalId);
     };
-  }, [fetchState]);
+  }, [fetchState, hasStarted]);
+
+  function handleStartScan() {
+    setIsBooting(true);
+    setActiveView("live");
+
+    window.setTimeout(() => {
+      setHasStarted(true);
+      setIsBooting(false);
+    }, 1800);
+  }
 
   const handleReset = async () => {
     try {
@@ -90,13 +106,20 @@ function App() {
     }
   }
 
+  if (!hasStarted) {
+    return <StartScreen isBooting={isBooting} onStart={handleStartScan} />;
+  }
+
   return (
     <div className="app">
       <header className="header">
-        <div>
-          <p className="eyebrow">Decision Intelligence Console</p>
-          <h1>AegisGrid</h1>
-          <p>Counter-Swarm Decision Intelligence Platform</p>
+        <div className="brand">
+          <img src="/aegisgrid-logo.jpeg" alt="AegisGrid logo" className="brand-logo" />
+          <div>
+            <p className="eyebrow">Decision Intelligence Console</p>
+            <h1>AegisGrid</h1>
+            <p>Counter-Swarm Decision Intelligence Platform</p>
+          </div>
         </div>
 
         <div className="header-actions">
@@ -112,6 +135,16 @@ function App() {
           <button className="icon-button" type="button" onClick={handleReset} title="Reset simulation">
             <RotateCcw size={18} />
           </button>
+
+          {data && (
+            <div className="header-scenario-control">
+              <ScenarioSelector
+                compact
+                scenario={data.scenario_type ?? data.scenario ?? "balanced"}
+                onChange={resetScenario}
+              />
+            </div>
+          )}
 
           <button className="demo-button" type="button" onClick={runDemoMode}>
             Run Demo Mode
@@ -144,11 +177,8 @@ function App() {
               </section>
 
               <aside className="live-sidebar">
-                <ScenarioSelector
-                  scenario={data.scenario_type ?? data.scenario ?? "balanced"}
-                  onChange={resetScenario}
-                />
-                <ScenarioDescription scenario={data.scenario_type ?? data.scenario ?? "balanced"} />
+                <MetricsPanel data={data} />
+                <ActionsPanel data={data} />
                 <CommandVerdict data={data} />
                 <ScenarioPanel data={data} />
               </aside>

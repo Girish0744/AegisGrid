@@ -1,4 +1,5 @@
 from typing import List, Dict
+import math
 import numpy as np
 from sklearn.cluster import DBSCAN
 
@@ -36,6 +37,14 @@ def cluster_tracks(tracks: List[Dict]) -> List[Dict]:
 
         center_x = sum(member["x"] for member in members) / len(members)
         center_y = sum(member["y"] for member in members) / len(members)
+        distances = [
+            math.sqrt((member["x"] - center_x) ** 2 + (member["y"] - center_y) ** 2)
+            for member in members
+        ]
+        average_distance = sum(distances) / len(distances)
+        cluster_radius = max(35, average_distance + 20)
+        cluster_diameter = cluster_radius * 2
+        cluster_density = len(members) / max(1, cluster_radius ** 2)
         avg_speed = sum(member["estimated_speed"] for member in members) / len(members)
         avg_confidence = sum(member["confidence"] for member in members) / len(members)
         avg_heading_alignment = sum(
@@ -48,12 +57,14 @@ def cluster_tracks(tracks: List[Dict]) -> List[Dict]:
             "drone_count": len(members),
             "center_x": round(center_x, 2),
             "center_y": round(center_y, 2),
+            "cluster_radius": round(cluster_radius, 2),
+            "cluster_diameter": round(cluster_diameter, 2),
+            "cluster_density": round(cluster_density, 6),
             "avg_speed": round(avg_speed, 2),
             "avg_confidence": round(avg_confidence, 2),
             "member_ids": [member["id"] for member in members],
             "decoy_ratio": round(sum(1 for member in members if member.get("is_decoy", False)) / len(members),2),
             "false_positive_ratio": round(sum(1 for member in members if member.get("is_false_positive", False)) / len(members),2),
-            "member_ids": [member["id"] for member in members],
             "avg_heading_alignment": round(avg_heading_alignment, 2),
         })
 

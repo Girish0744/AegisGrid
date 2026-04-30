@@ -6,7 +6,11 @@ from app.sensor import generate_sensor_detections
 from app.fusion import TRACK_HISTORY, fuse_detections
 from app.clustering import cluster_tracks
 from app.threat_engine import enrich_clusters_with_threat
-from app.decision import allocate_baseline, allocate_aegisgrid
+from app.decision import (
+    allocate_baseline,
+    allocate_aegisgrid,
+    stabilize_assignments
+)
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -23,6 +27,8 @@ app.add_middleware(
 
 current_scenario = "balanced"
 DRONE_COUNT = 100
+DECISION_STATE = {}
+SIMULATION_TICK = 0
 
 drones = generate_drones(DRONE_COUNT, scenario_type=current_scenario)
 
@@ -54,7 +60,10 @@ def get_config():
 
 @app.get("/state")
 def get_state():
-    global drones
+    global drones, SIMULATION_TICK
+
+    SIMULATION_TICK += 1
+    DECISION_STATE["current_tick"] = SIMULATION_TICK
 
     drones = update_drones(drones)
 
@@ -64,7 +73,12 @@ def get_state():
     threat_clusters = enrich_clusters_with_threat(clusters)
 
     baseline_decision = allocate_baseline(threat_clusters)
-    aegisgrid_decision = allocate_aegisgrid(threat_clusters)
+    raw_aegisgrid_decision = allocate_aegisgrid(threat_clusters)
+    aegisgrid_decision = stabilize_assignments(
+        raw_aegisgrid_decision,
+        threat_clusters,
+        DECISION_STATE
+    )
 
     evaluation = evaluate_strategies(
         threat_clusters,
@@ -87,6 +101,7 @@ def get_state():
         "tracks": tracks,
         "clusters": threat_clusters,
         "baseline_decision": baseline_decision,
+        "raw_aegisgrid_decision": raw_aegisgrid_decision,
         "aegisgrid_decision": aegisgrid_decision,
         "evaluation": evaluation,
         "report": report
@@ -95,7 +110,7 @@ def get_state():
 
 @app.post("/reset")
 def reset_simulation(scenario_type: str = "balanced"):
-    global drones, current_scenario
+    global drones, current_scenario, SIMULATION_TICK
 
     allowed_scenarios = {"balanced", "decoy_heavy", "split_attack"}
 
@@ -105,6 +120,8 @@ def reset_simulation(scenario_type: str = "balanced"):
     current_scenario = scenario_type
 
     TRACK_HISTORY.clear()
+    DECISION_STATE.clear()
+    SIMULATION_TICK = 0
     drones = generate_drones(DRONE_COUNT, scenario_type=current_scenario)
 
     return {
