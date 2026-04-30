@@ -128,7 +128,11 @@ def generate_after_action_report(state: Dict[str, Any]) -> Dict[str, Any]:
             f"and ETA {top_cluster.get('eta')}s."
         )
 
-    
+    limitations = [
+        "Simulation uses synthetic telemetry rather than real sensor feeds.",
+        "AI explanations are grounded in backend metrics and do not control allocation decisions.",
+        "Threat assessment depends on sensor confidence, clustering quality, and scenario assumptions.",
+    ]
 
     return {
         "title": "AegisGrid After-Action Report",
@@ -138,6 +142,7 @@ def generate_after_action_report(state: Dict[str, Any]) -> Dict[str, Any]:
             f"improvement of {improvement}%."
         ),
         "key_findings": key_findings,
+        "limitations": limitations,
         "verdict": report.get("verdict", "UNKNOWN"),
         "trust_status": "deterministic_validated",
     }

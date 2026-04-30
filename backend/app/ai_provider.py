@@ -126,22 +126,18 @@ def call_ai_after_action_agent(report_context: Dict[str, Any]) -> Optional[Dict[
                 {
                     "role": "user",
                     "content": json.dumps({
-                        "task": (
-                            "Generate a fresh command-level after-action report from this exact AegisGrid run. "
-                            "Use the provided baseline metrics, AegisGrid metrics, improvement, detection rate, "
-                            "missed detections, verdict, and top threat data. "
-                            "Do not reuse generic template language."
-                        ),
+                        "task": "Rewrite this deterministic report into a concise command-level after-action report.",
                         "rules": [
-                            "Use actual numbers from the report context.",
-                            "Explain what AegisGrid improved and what risk remains.",
-                            "Do not invent values.",
-                            "Do not output generic boilerplate.",
+                            "Use only provided facts.",
+                            "Do not invent numbers.",
+                            "Do not suggest offensive action.",
+                            "Return valid JSON only."
                         ],
                         "required_output": {
                             "title": "string",
                             "summary": "string",
                             "key_findings": ["string"],
+                            "limitations": ["string"],
                             "verdict": "string",
                             "trust_status": "ai_generated_validated"
                         },
@@ -194,26 +190,21 @@ def call_ai_snapshot_agent(snapshot_context: Dict[str, Any]) -> Optional[Dict[st
                 {
                     "role": "user",
                     "content": json.dumps({
-                        "task": (
-                            "Analyze the current AegisGrid operational snapshot. "
-                            "Generate a fresh situation analysis based only on this exact snapshot. "
-                            "Do not reuse template language. "
-                            "Mention the current scenario, top cluster, detection rate, breach risk, "
-                            "resource allocation, and the most important operational concern."
-                        ),
+                        "task": "Analyze this current counter-swarm snapshot.",
                         "rules": [
-                            "Every response must be specific to the provided snapshot values.",
-                            "Use actual cluster IDs, ETA values, threat scores, and risk numbers when available.",
-                            "Do not produce generic text.",
+                            "Use only provided values.",
+                            "Do not invent numbers.",
+                            "Do not recommend offensive action.",
+                            "Focus on situation awareness and strategy planning.",
+                            "Return valid JSON only."
                         ],
                         "required_output": {
                             "title": "string",
                             "situation": "string",
                             "primary_risk": "string",
                             "recommended_focus": "string",
-                            "evidence": [
-                                "specific evidence using actual values from snapshot"
-                            ],
+                            "evidence": ["string"],
+                            "limitations": ["string"],
                             "trust_status": "ai_generated_validated"
                         },
                         "snapshot": snapshot_context,
