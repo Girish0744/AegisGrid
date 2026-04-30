@@ -60,6 +60,9 @@ export type Cluster = {
   drone_count?: number;
   center_x: number;
   center_y: number;
+  cluster_radius?: number;
+  cluster_diameter?: number;
+  cluster_density?: number;
   avg_speed?: number;
   avg_confidence?: number;
   avg_heading_alignment?: number;

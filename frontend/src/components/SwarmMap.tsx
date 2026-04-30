@@ -102,7 +102,8 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
         const isAegisAssigned = aegisAssignedIds.has(cluster.cluster_id);
         const isBaselineAssigned = baselineAssignedIds.has(cluster.cluster_id);
         const isTopThreat = topThreat?.cluster_id === cluster.cluster_id;
-        const radius = Math.max(36, (cluster.drone_count ?? 0) * 4.5);
+        const droneCount = cluster.drone_count ?? 0;
+        const visualRadius = cluster.cluster_radius ?? Math.max(46, Math.sqrt(droneCount) * 18);
 
         return (
           <g key={cluster.cluster_id}>
@@ -110,7 +111,7 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
               className="cluster-ring"
               cx={cluster.center_x}
               cy={cluster.center_y}
-              r={radius + 18}
+              r={visualRadius + 18}
               fill={color}
               opacity={isTopThreat ? 0.12 : 0.07}
               filter="url(#softGlow)"
@@ -119,7 +120,7 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
             {isTopThreat && (
               <text
                 x={cluster.center_x + 18}
-                y={cluster.center_y - radius - 22}
+                y={cluster.center_y - visualRadius - 22}
                 fill="#fca5a5"
                 fontSize="21"
                 fontWeight="900"
@@ -131,7 +132,7 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
             <circle
               cx={cluster.center_x}
               cy={cluster.center_y}
-              r={radius}
+              r={visualRadius}
               fill="none"
               stroke={color}
               strokeWidth={isAegisAssigned ? 7 : isBaselineAssigned ? 4 : 3}
@@ -142,18 +143,30 @@ export function SwarmMap({ data }: { data: AegisGridState }) {
             <circle cx={cluster.center_x} cy={cluster.center_y} r="5" fill={color} />
 
             <text
-              x={cluster.center_x + 13}
-              y={cluster.center_y - 12}
-              fill={color}
-              fontSize="20"
+              x={cluster.center_x}
+              y={cluster.center_y - 8}
+              textAnchor="middle"
+              fill="#e2e8f0"
+              fontSize="14"
               fontWeight="900"
             >
-              C{cluster.cluster_id} | {(cluster.threat_score ?? 0).toFixed(1)}
+              C{cluster.cluster_id} · {droneCount} drones
+            </text>
+
+            <text
+              x={cluster.center_x}
+              y={cluster.center_y + 12}
+              textAnchor="middle"
+              fill={color}
+              fontSize="11"
+              fontWeight="800"
+            >
+              {(cluster.threat_level ?? "low").toUpperCase()}
             </text>
 
             <title>
-              Cluster {cluster.cluster_id}: {cluster.drone_count ?? 0} drones, ETA {cluster.eta ?? "unknown"}s,
-              threat {cluster.threat_score ?? 0}
+              Cluster {cluster.cluster_id}: {droneCount} drones, radius {cluster.cluster_radius ?? "estimated"},
+              ETA {cluster.eta ?? "unknown"}s, threat {cluster.threat_score ?? 0}
             </title>
           </g>
         );
@@ -193,7 +206,7 @@ function MapGrid() {
 function MapLegend() {
   return (
     <g>
-      <rect x="24" y="24" width="315" height="152" rx="18" fill="#020617" stroke="#1e293b" opacity="0.94" />
+      <rect x="24" y="24" width="395" height="214" rx="18" fill="#020617" stroke="#1e293b" opacity="0.94" />
       <text x="44" y="54" fill="#f8fafc" fontSize="17" fontWeight="900">Tactical Overlay</text>
 
       <circle cx="50" cy="84" r="5" fill="#60a5fa" />
@@ -204,6 +217,11 @@ function MapLegend() {
 
       <line x1="38" y1="142" x2="62" y2="142" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" />
       <text x="68" y="148" fill="#cbd5e1" fontSize="15">AegisGrid allocation</text>
+
+      <circle cx="50" cy="177" r="13" fill="none" stroke="#f59e0b" strokeWidth="3" strokeDasharray="6 5" />
+      <text x="68" y="182" fill="#cbd5e1" fontSize="15">Cluster circle size = estimated spatial spread</text>
+
+      <text x="44" y="212" fill="#cbd5e1" fontSize="15">Label = cluster ID and drone count</text>
     </g>
   );
 }
