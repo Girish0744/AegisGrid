@@ -78,7 +78,7 @@ function App() {
     window.setTimeout(() => {
       setHasStarted(true);
       setIsBooting(false);
-    }, 900);
+    }, 1800);
   }
 
   const handleReset = async () => {

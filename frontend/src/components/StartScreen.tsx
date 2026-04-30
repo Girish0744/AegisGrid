@@ -23,7 +23,25 @@ export function StartScreen({ isBooting, onStart }: Props) {
       <div className="start-route route-two" />
       <div className="start-route route-three" />
 
-      <section className="start-panel" aria-label="AegisGrid startup">
+      {/* ── Transition overlay ── */}
+      {isBooting && (
+        <div className="boot-overlay" aria-hidden="true">
+          <div className="boot-scanline" />
+          <div className="boot-flash" />
+        </div>
+      )}
+
+      {/* ── Top bar ── */}
+      <header className="start-topbar">
+
+        <div className="start-topbar-center">
+          <span>COUNTER-SWARM DECISION INTELLIGENCE</span>
+        </div>
+      </header>
+
+
+      {/* ── Center hero ── */}
+      <section className="start-panel" aria-label="Launch scan">
         <div className="start-logo-wrap">
           <div className="radar-ring ring-one" />
           <div className="radar-ring ring-two" />
@@ -52,10 +70,11 @@ export function StartScreen({ isBooting, onStart }: Props) {
             <button className="start-button" type="button" onClick={onStart}>
               Start Scan
             </button>
-            <p className="start-status">Simulation-only decision support</p>
           </>
         )}
       </section>
+
+
     </main>
   );
 }
