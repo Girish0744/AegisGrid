@@ -60,7 +60,7 @@ def confidence_label(confidence: float) -> str:
     return "low"
 
 
-def validate_explanation(explanation: Dict[str, Any]) -> bool:
+def validate_explanation(explanation: Dict[str, Any], context: Dict[str, Any] | None = None) -> bool:
     if not isinstance(explanation, dict):
         return False
 
@@ -71,6 +71,37 @@ def validate_explanation(explanation: Dict[str, Any]) -> bool:
         return False
 
     if len(explanation["evidence"]) == 0:
+        return False
+
+    if explanation["confidence_label"] not in {"low", "medium", "high"}:
+        return False
+
+    if context is None:
+        return True
+
+    if explanation["cluster_id"] != context["cluster_id"]:
+        return False
+
+    if explanation["resource_id"] != context["resource_id"]:
+        return False
+
+    allowed_values = [
+        str(context.get("threat_score")),
+        str(context.get("threat_level")),
+        str(context.get("eta")),
+        str(context.get("drone_count")),
+        str(context.get("avg_confidence")),
+        str(context.get("distance_to_target")),
+    ]
+
+    evidence_text = " ".join(str(item) for item in explanation["evidence"])
+
+    has_grounding = any(
+        value != "None" and value in evidence_text
+        for value in allowed_values
+    )
+
+    if not has_grounding:
         return False
 
     return True

@@ -31,12 +31,12 @@ def generate_decision_explanations(
 
         ai_explanation = call_ai_explanation_agent(context)
 
-        if ai_explanation and validate_explanation(ai_explanation):
+        if ai_explanation and validate_explanation(ai_explanation, context):
             explanation = ai_explanation
         else:
             explanation = fallback_decision_explanation(context)
 
-        if not validate_explanation(explanation):
+        if not validate_explanation(explanation, context):
             explanation = {
                 "cluster_id": assignment["cluster_id"],
                 "resource_id": assignment["resource_id"],
