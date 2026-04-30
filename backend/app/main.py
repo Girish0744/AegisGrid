@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -209,6 +212,7 @@ def classify_verdict(
         return "PARTIAL CONTAINMENT"
 
     return "HIGH RISK - ADDITIONAL RESOURCES REQUIRED"
+
 
 @app.get("/debug-summary")
 def debug_summary():

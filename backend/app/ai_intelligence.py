@@ -5,6 +5,7 @@ from app.ai_contract import (
     fallback_decision_explanation,
     validate_explanation,
 )
+from app.ai_provider import call_ai_explanation_agent
 
 
 def generate_decision_explanations(
@@ -28,7 +29,12 @@ def generate_decision_explanations(
 
         context = build_decision_context(cluster, assignment)
 
-        explanation = fallback_decision_explanation(context)
+        ai_explanation = call_ai_explanation_agent(context)
+
+        if ai_explanation and validate_explanation(ai_explanation):
+            explanation = ai_explanation
+        else:
+            explanation = fallback_decision_explanation(context)
 
         if not validate_explanation(explanation):
             explanation = {
