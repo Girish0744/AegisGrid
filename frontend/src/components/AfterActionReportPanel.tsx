@@ -50,7 +50,7 @@ export function AfterActionReportPanel({ data }: { data: AegisGridState }) {
 
       <div className="verdict-card">
         <strong>{displayReport.verdict}</strong>
-        <span>Trust: {displayReport.trust_status}</span>
+        {/* <span>Trust: {displayReport.trust_status}</span> */}
       </div>
 
       <p className="report-summary">{displayReport.summary}</p>

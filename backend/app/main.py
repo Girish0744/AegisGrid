@@ -302,7 +302,7 @@ def classify_verdict(
         return "BREACH RISK CONTAINED"
 
     if breach_risk <= 55 and assignments_count >= min(critical_clusters, 1):
-        return "PARTIAL CONTAINMENT"
+        return "PARTIAL SAFETY BREACH"
 
     return "HIGH RISK - ADDITIONAL RESOURCES REQUIRED"
 

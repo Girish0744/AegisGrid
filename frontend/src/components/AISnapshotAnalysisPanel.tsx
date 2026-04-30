@@ -13,7 +13,7 @@ type SnapshotAnalysis = {
 
 export function AISnapshotAnalysisPanel() {
   const [analysis, setAnalysis] = useState<SnapshotAnalysis | null>(null);
-  const [snapshotTick, setSnapshotTick] = useState<number | null>(null);
+  //const [snapshotTick, setSnapshotTick] = useState<number | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   async function handleAnalyze() {
@@ -21,7 +21,7 @@ export function AISnapshotAnalysisPanel() {
       setIsAnalyzing(true);
       const result = await analyzeAISnapshot();
       setAnalysis(result.analysis);
-      setSnapshotTick(result.snapshot_tick);
+      //setSnapshotTick(result.snapshot_tick);
     } finally {
       setIsAnalyzing(false);
     }
@@ -51,10 +51,10 @@ export function AISnapshotAnalysisPanel() {
         <div className="snapshot-analysis">
           <div className="verdict-card">
             <strong>{analysis.title}</strong>
-            <span>
+            {/* <span>
               Trust: {analysis.trust_status}
               {snapshotTick !== null ? ` · Tick ${snapshotTick}` : ""}
-            </span>
+            </span> */}
           </div>
 
           <p>{analysis.situation}</p>
