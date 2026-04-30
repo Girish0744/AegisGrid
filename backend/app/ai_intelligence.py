@@ -97,3 +97,52 @@ def generate_mission_summary(state: Dict[str, Any]) -> Dict[str, Any]:
         "detection_rate": detection_rate,
         "trust_status": "deterministic_validated",
     }
+
+def generate_after_action_report(state: Dict[str, Any]) -> Dict[str, Any]:
+    evaluation = state.get("evaluation", {})
+    report = state.get("report", {})
+    clusters = state.get("clusters", [])
+
+    baseline = evaluation.get("baseline", {})
+    aegisgrid = evaluation.get("aegisgrid", {})
+    improvement = evaluation.get("improvement", 0)
+
+    top_cluster = max(
+        clusters,
+        key=lambda cluster: cluster.get("threat_score", 0),
+        default=None,
+    )
+
+    key_findings = [
+        f"Baseline breach risk: {baseline.get('breach_risk', 'unavailable')}%",
+        f"AegisGrid breach risk: {aegisgrid.get('breach_risk', 'unavailable')}%",
+        f"Measured improvement: {improvement}%",
+        f"Detection rate: {report.get('detection_rate', 'unavailable')}%",
+        f"Estimated missed detections: {report.get('missed_detection_estimate', 'unavailable')}",
+    ]
+
+    if top_cluster:
+        key_findings.append(
+            f"Primary threat cluster: C{top_cluster.get('cluster_id')} "
+            f"with threat score {top_cluster.get('threat_score')} "
+            f"and ETA {top_cluster.get('eta')}s."
+        )
+
+    limitations = [
+        "Simulation uses synthetic telemetry rather than real sensor feeds.",
+        "AI explanations are grounded in backend metrics and do not control allocation decisions.",
+        "Threat assessment depends on sensor confidence, clustering quality, and scenario assumptions.",
+    ]
+
+    return {
+        "title": "AegisGrid After-Action Report",
+        "summary": (
+            f"AegisGrid processed the active swarm scenario, compared baseline allocation "
+            f"against its optimized response strategy, and measured a simulated breach-risk "
+            f"improvement of {improvement}%."
+        ),
+        "key_findings": key_findings,
+        "limitations": limitations,
+        "verdict": report.get("verdict", "UNKNOWN"),
+        "trust_status": "deterministic_validated",
+    }

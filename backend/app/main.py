@@ -14,7 +14,7 @@ from app.decision import (
     allocate_aegisgrid,
     stabilize_assignments
 )
-from app.ai_intelligence import generate_decision_explanations, generate_mission_summary
+from app.ai_intelligence import generate_decision_explanations, generate_mission_summary, generate_after_action_report
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -113,6 +113,9 @@ def get_state():
         aegisgrid_decision=aegisgrid_decision
     )
 
+    state_payload["report"] = report
+    after_action_report = generate_after_action_report(state_payload)
+
     return {
         "scenario": current_scenario,
         "scenario_type": current_scenario,
@@ -126,7 +129,8 @@ def get_state():
         "ai_insights": {
             "decision_explanations": decision_explanations,
             "mission_summary": mission_summary,
-            "trust_status": "deterministic_validated"
+            "trust_status": "deterministic_validated",
+            "after_action_report": after_action_report
         },
         "evaluation": evaluation,
         "report": report
