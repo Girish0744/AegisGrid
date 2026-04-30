@@ -30,3 +30,8 @@ export async function generateAIAfterActionReport() {
   const response = await api.post("/ai/after-action");
   return response.data;
 }
+
+export async function analyzeAISnapshot() {
+  const response = await api.post("/ai/analyze-snapshot");
+  return response.data;
+}

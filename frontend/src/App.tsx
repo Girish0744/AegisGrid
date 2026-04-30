@@ -17,6 +17,7 @@ import { StartScreen } from "./components/StartScreen";
 import { PipelineStatus } from "./components/PipelineStatus";
 import { MissionSummaryPanel } from "./components/MissionSummaryPanel";
 import { AfterActionReportPanel } from "./components/AfterActionReportPanel";
+import { AISnapshotAnalysisPanel } from "./components/AISnapshotAnalysisPanel";
 import { LogPanel } from "./components/LogPanel";
 import type { AegisGridState } from "./types";
 import "./App.css";
@@ -180,6 +181,7 @@ function App() {
 
               <aside className="live-sidebar">
                 <MissionSummaryPanel data={data} />
+                <AISnapshotAnalysisPanel />
                 <MetricsPanel data={data} />
                 <ActionsPanel data={data} />
                 <CommandVerdict data={data} />

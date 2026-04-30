@@ -15,7 +15,7 @@ from app.decision import (
     stabilize_assignments
 )
 from app.ai_intelligence import generate_decision_explanations, generate_mission_summary, generate_after_action_report
-from app.ai_provider import call_ai_after_action_agent
+from app.ai_provider import call_ai_after_action_agent, call_ai_snapshot_agent
 from app.evaluation import evaluate_strategies
 from app.config import MAP_HEIGHT, MAP_WIDTH, TARGET_X, TARGET_Y
 
@@ -36,7 +36,7 @@ DECISION_STATE = {}
 SIMULATION_TICK = 0
 
 drones = generate_drones(DRONE_COUNT, scenario_type=current_scenario)
-
+LATEST_STATE = {}
 
 @app.get("/")
 def root():
@@ -117,7 +117,7 @@ def get_state():
     state_payload["report"] = report
     after_action_report = generate_after_action_report(state_payload)
 
-    return {
+    state_response = {
         "scenario": current_scenario,
         "scenario_type": current_scenario,
         "true_drones": drones,
@@ -136,6 +136,10 @@ def get_state():
         "evaluation": evaluation,
         "report": report
     }
+
+    global LATEST_STATE
+    LATEST_STATE = state_response
+    return state_response
 
 @app.post("/ai/after-action")
 def ai_after_action():
@@ -156,6 +160,70 @@ def ai_after_action():
         "message": "Deterministic after-action report returned",
         "report": deterministic_report,
         "trust_status": deterministic_report["trust_status"]
+    }
+
+@app.post("/ai/analyze-snapshot")
+def analyze_snapshot():
+    if not LATEST_STATE:
+        state = get_state()
+    else:
+        state = LATEST_STATE
+
+    top_clusters = sorted(
+        state["clusters"],
+        key=lambda cluster: cluster.get("threat_score", 0),
+        reverse=True
+    )[:5]
+
+    snapshot_context = {
+        "scenario": state["scenario_type"],
+        "drone_count": len(state["true_drones"]),
+        "detections": len(state["detections"]),
+        "tracks": len(state["tracks"]),
+        "cluster_count": len(state["clusters"]),
+        "top_clusters": top_clusters,
+        "aegisgrid_decision": state["aegisgrid_decision"],
+        "evaluation": state["evaluation"],
+        "report": state["report"],
+    }
+
+    ai_analysis = call_ai_snapshot_agent(snapshot_context)
+
+    if ai_analysis:
+        return {
+            "message": "AI snapshot analysis generated",
+            "analysis": ai_analysis,
+            "snapshot_tick": SIMULATION_TICK,
+            "trust_status": "ai_generated_validated",
+        }
+
+    return {
+        "message": "Deterministic snapshot analysis returned",
+        "analysis": {
+            "title": "Snapshot Analysis",
+            "situation": (
+                f"AegisGrid is tracking {len(state['clusters'])} clusters "
+                f"from {len(state['tracks'])} fused tracks."
+            ),
+            "primary_risk": (
+                f"Top cluster: C{top_clusters[0]['cluster_id']}"
+                if top_clusters else "No active cluster risk identified."
+            ),
+            "recommended_focus": "Continue monitoring highest-threat clusters and resource coverage.",
+            "evidence": [
+                f"Scenario: {state['scenario_type']}",
+                f"Clusters: {len(state['clusters'])}",
+                f"Tracks: {len(state['tracks'])}",
+                f"Improvement: {state['evaluation'].get('improvement')}%",
+            ],
+            "limitations": [
+                "AI analysis is advisory and based only on the captured snapshot.",
+                "Live tracking continues independently of this analysis.",
+            ],
+            "trust_status": "deterministic_validated",
+        },
+        "snapshot_tick": SIMULATION_TICK,
+        "trust_status": "deterministic_validated",
     }
 
 @app.post("/reset")

@@ -1986,3 +1986,14 @@ select {
   font-size: 13px;
   line-height: 1.6;
 }
+
+.snapshot-analysis {
+  margin-top: 12px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.snapshot-analysis p {
+  margin-top: 10px;
+}

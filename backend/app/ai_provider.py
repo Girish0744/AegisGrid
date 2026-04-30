@@ -157,3 +157,69 @@ def call_ai_after_action_agent(report_context: Dict[str, Any]) -> Optional[Dict[
 
     except Exception:
         return None
+    
+
+def call_ai_snapshot_agent(snapshot_context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    model = os.getenv("OPENROUTER_MODEL", "openrouter/free")
+
+    if not api_key:
+        return None
+
+    try:
+        client = OpenAI(
+            base_url=OPENROUTER_BASE_URL,
+            api_key=api_key,
+            timeout=8.0,
+        )
+
+        response = client.chat.completions.create(
+            model=model,
+            temperature=0.2,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an operational analysis assistant for AegisGrid. "
+                        "Analyze only the provided snapshot. "
+                        "Do not invent facts. "
+                        "Do not control or change decisions. "
+                        "Return valid JSON only."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps({
+                        "task": "Analyze this current counter-swarm snapshot.",
+                        "rules": [
+                            "Use only provided values.",
+                            "Do not invent numbers.",
+                            "Do not recommend offensive action.",
+                            "Focus on situation awareness and strategy planning.",
+                            "Return valid JSON only."
+                        ],
+                        "required_output": {
+                            "title": "string",
+                            "situation": "string",
+                            "primary_risk": "string",
+                            "recommended_focus": "string",
+                            "evidence": ["string"],
+                            "limitations": ["string"],
+                            "trust_status": "ai_generated_validated"
+                        },
+                        "snapshot": snapshot_context,
+                    }),
+                },
+            ],
+        )
+
+        content = response.choices[0].message.content
+        if not content:
+            return None
+
+        parsed = json.loads(content)
+        parsed["trust_status"] = "ai_generated_validated"
+        return parsed
+
+    except Exception:
+        return None
