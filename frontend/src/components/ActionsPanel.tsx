@@ -64,6 +64,7 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                 </p>
               )}
               <p>Reason: {assignment.reason}</p>
+
               {explanation ? (
                 <div className="ai-explanation">
                   <p>{explanation.summary}</p>
@@ -74,16 +75,14 @@ export function ActionsPanel({ data }: { data: AegisGridState }) {
                     ))}
                   </ul>
 
-              
+                  
 
                   <span className="trust-badge">
                     Trust: {explanation.trust_status} · Confidence:{" "}
                     {explanation.confidence_label}
                   </span>
                 </div>
-              ) : (
-                
-              )}
+              ):null}
             </div>
           );
         })}
